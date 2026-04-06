@@ -1,0 +1,169 @@
+/**
+ * Kin Analytics Design Tokens — CSS Custom Properties
+ *
+ * Light mode is the default (:root).
+ * Dark mode is activated by setting data-theme="dark" on <html> or any container.
+ *
+ * Import once at the root of your app:
+ *   import '@kin/design-system/src/tokens.css'
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Albert+Sans:wght@400;500;600;700&display=swap');
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* LIGHT MODE (default)                                                        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* ─── Brand ──────────────────────────────────────── */
+  --ka-color-primary: #E5FF01;
+  --ka-color-primary-hover: #d4ee00;
+  --ka-color-primary-active: #bfd400;
+  --ka-color-primary-text: #141417;     /* text ON primary bg — always dark */
+
+  /* ─── Neutrals — Light ───────────────────────────── */
+  --ka-color-text: #141417;
+  --ka-color-text-secondary: #444444;
+  --ka-color-text-tertiary: #999ea6;
+  --ka-color-text-disabled: rgba(20, 20, 23, 0.25);
+  --ka-color-text-placeholder: rgba(20, 20, 23, 0.35);
+
+  --ka-color-bg: #ffffff;
+  --ka-color-bg-layout: #F2F2F2;
+  --ka-color-bg-elevated: #ffffff;
+  --ka-color-bg-surface: #ffffff;
+
+  --ka-color-border: #d4d5d6;
+  --ka-color-border-secondary: rgba(0, 0, 0, 0.06);
+  --ka-color-split: rgba(0, 0, 0, 0.06);
+
+  /* ─── Semantic ───────────────────────────────────── */
+  --ka-color-error: #d7170c;
+  --ka-color-error-bg: #fadcd9;
+  --ka-color-error-border: #d7170c;
+
+  --ka-color-success: #4caf50;
+  --ka-color-success-bg: #f0fdf4;
+  --ka-color-success-border: #4caf50;
+
+  --ka-color-warning: #F5A623;
+  --ka-color-warning-bg: #FFF8ED;
+  --ka-color-warning-border: #F5A623;
+
+  --ka-color-info: #1890ff;
+  --ka-color-info-bg: #e6f4ff;
+  --ka-color-info-border: #1890ff;
+
+  /* ─── Typography ─────────────────────────────────── */
+  --ka-font-heading: 'Space Grotesk', sans-serif;
+  --ka-font-body: 'Albert Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --ka-text-h1: 38px;
+  --ka-text-h2: 28px;
+  --ka-text-h3: 24px;
+  --ka-text-h4: 20px;
+  --ka-text-h5: 16px;
+
+  --ka-text-body-lg: 16px;
+  --ka-text-body: 14px;
+  --ka-text-small: 12px;
+  --ka-text-caption: 11px;
+
+  --ka-fw-regular: 400;
+  --ka-fw-medium: 500;
+  --ka-fw-semibold: 600;
+  --ka-fw-bold: 700;
+
+  --ka-lh-heading: 1.2;
+  --ka-lh-body: 1.5;
+  --ka-lh-small: 1.4;
+  --ka-lh-caption: 1.33;
+
+  --ka-letter-spacing: -0.5px;
+
+  /* ─── Spacing (4px base grid) ────────────────────── */
+  --ka-space-1: 4px;
+  --ka-space-2: 8px;
+  --ka-space-3: 12px;
+  --ka-space-4: 16px;
+  --ka-space-5: 20px;
+  --ka-space-6: 24px;
+  --ka-space-8: 32px;
+  --ka-space-10: 40px;
+  --ka-space-12: 48px;
+  --ka-space-16: 64px;
+
+  /* ─── Border Radius ──────────────────────────────── */
+  --ka-radius-xs: 2px;
+  --ka-radius-sm: 4px;
+  --ka-radius: 6px;
+  --ka-radius-lg: 8px;
+  --ka-radius-pill: 9999px;
+  --ka-radius-full: 9999px;
+
+  /* ─── Shadows — Light ────────────────────────────── */
+  --ka-shadow-sm: 0px 1px 3px 0px rgba(0,0,0,0.08), 0px 1px 2px -1px rgba(0,0,0,0.06);
+  --ka-shadow:    0px 4px 8px 0px rgba(0,0,0,0.08), 0px 2px 4px -2px rgba(0,0,0,0.06);
+  --ka-shadow-lg: 0px 6px 16px 0px rgba(0,0,0,0.08), 0px 3px 6px 0px rgba(0,0,0,0.12), 0px 9px 28px 0px rgba(0,0,0,0.05);
+
+  /* ─── Z-index ─────────────────────────────────────── */
+  --ka-z-dropdown: 1050;
+  --ka-z-modal: 1000;
+  --ka-z-drawer: 1000;
+  --ka-z-toast: 1200;
+  --ka-z-tooltip: 1070;
+
+  /* ─── Transitions ────────────────────────────────── */
+  --ka-duration-fast: 0.1s;
+  --ka-duration-base: 0.2s;
+  --ka-duration-slow: 0.3s;
+  --ka-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* DARK MODE                                                                   */
+/* ─────────────────────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  /* ─── Brand (accent unchanged) ───────────────────── */
+  --ka-color-primary: #E5FF01;
+  --ka-color-primary-hover: #d4ee00;
+  --ka-color-primary-active: #bfd400;
+  --ka-color-primary-text: #141417;
+
+  /* ─── Neutrals — Dark ────────────────────────────── */
+  --ka-color-text: #ffffff;
+  --ka-color-text-secondary: #b3b3b3;
+  --ka-color-text-tertiary: #999ea6;
+  --ka-color-text-disabled: rgba(255, 255, 255, 0.25);
+  --ka-color-text-placeholder: rgba(255, 255, 255, 0.35);
+
+  --ka-color-bg: #111111;
+  --ka-color-bg-layout: #0d0d0d;
+  --ka-color-bg-elevated: #1E1E1E;
+  --ka-color-bg-surface: #252525;
+
+  --ka-color-border: rgba(255, 255, 255, 0.12);
+  --ka-color-border-secondary: rgba(255, 255, 255, 0.06);
+  --ka-color-split: rgba(255, 255, 255, 0.06);
+
+  /* ─── Semantic — Dark ────────────────────────────── */
+  --ka-color-error: #ff4d4f;
+  --ka-color-error-bg: rgba(215, 23, 12, 0.15);
+  --ka-color-error-border: rgba(215, 23, 12, 0.5);
+
+  --ka-color-success: #52c41a;
+  --ka-color-success-bg: rgba(76, 175, 80, 0.15);
+  --ka-color-success-border: rgba(76, 175, 80, 0.5);
+
+  --ka-color-warning: #faad14;
+  --ka-color-warning-bg: rgba(245, 166, 35, 0.15);
+  --ka-color-warning-border: rgba(245, 166, 35, 0.5);
+
+  --ka-color-info: #1890ff;
+  --ka-color-info-bg: rgba(24, 144, 255, 0.15);
+  --ka-color-info-border: rgba(24, 144, 255, 0.5);
+
+  /* ─── Shadows — Dark ─────────────────────────────── */
+  --ka-shadow-sm: 0px 1px 3px 0px rgba(0,0,0,0.4), 0px 1px 2px -1px rgba(0,0,0,0.3);
+  --ka-shadow:    0px 4px 8px 0px rgba(0,0,0,0.4), 0px 2px 4px -2px rgba(0,0,0,0.3);
+  --ka-shadow-lg: 0px 6px 16px 0px rgba(0,0,0,0.5), 0px 3px 6px 0px rgba(0,0,0,0.4), 0px 9px 28px 0px rgba(0,0,0,0.3);
+}

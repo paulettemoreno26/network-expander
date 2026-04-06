@@ -1,0 +1,91 @@
+/**
+ * Kin Analytics Typography System
+ *
+ * Fonts:
+ *   - Space Grotesk → headings (h1–h5)
+ *   - Albert Sans   → all body/UI text
+ *
+ * Key brand rule: letter-spacing: -0.5px applied universally.
+ *
+ * Import AFTER tokens.css.
+ */
+
+/* ─── Global letter-spacing ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  letter-spacing: var(--ka-letter-spacing);
+}
+
+/* ─── Heading Resets ─────────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5,
+.ant-typography h1,
+.ant-typography h2,
+.ant-typography h3,
+.ant-typography h4,
+.ant-typography h5 {
+  font-family: var(--ka-font-heading);
+  color: var(--ka-color-text);
+  margin: 0;
+}
+
+h1 { font-size: var(--ka-text-h1); font-weight: 600; line-height: 1.2; }
+h2 { font-size: var(--ka-text-h2); font-weight: 600; line-height: 1.2; }
+h3 { font-size: var(--ka-text-h3); font-weight: 500; line-height: 1.25; }
+h4 { font-size: var(--ka-text-h4); font-weight: 500; line-height: 1.3; }
+h5 { font-size: var(--ka-text-h5); font-weight: 500; line-height: 1.35; }
+
+/* ─── Utility Classes ────────────────────────────────────────────────────── */
+
+/* Headings — Space Grotesk */
+.ka-h1 { font-family: var(--ka-font-heading); font-size: 38px; font-weight: 600; line-height: 1.2; color: var(--ka-color-text); letter-spacing: -0.5px; }
+.ka-h2 { font-family: var(--ka-font-heading); font-size: 28px; font-weight: 600; line-height: 1.2; color: var(--ka-color-text); letter-spacing: -0.5px; }
+.ka-h3 { font-family: var(--ka-font-heading); font-size: 24px; font-weight: 500; line-height: 1.25; color: var(--ka-color-text); letter-spacing: -0.5px; }
+.ka-h4 { font-family: var(--ka-font-heading); font-size: 20px; font-weight: 500; line-height: 1.3; color: var(--ka-color-text); letter-spacing: -0.5px; }
+.ka-h5 { font-family: var(--ka-font-heading); font-size: 16px; font-weight: 500; line-height: 1.35; color: var(--ka-color-text); letter-spacing: -0.5px; }
+
+/* Body — Albert Sans */
+.ka-body-lg         { font-family: var(--ka-font-body); font-size: 16px; font-weight: 400; line-height: 1.5; color: var(--ka-color-text); }
+.ka-body-lg-medium  { font-family: var(--ka-font-body); font-size: 16px; font-weight: 500; line-height: 1.5; color: var(--ka-color-text); }
+.ka-body-lg-bold    { font-family: var(--ka-font-body); font-size: 16px; font-weight: 700; line-height: 1.5; color: var(--ka-color-text); }
+
+.ka-body            { font-family: var(--ka-font-body); font-size: 14px; font-weight: 400; line-height: 1.5; color: var(--ka-color-text); }
+.ka-body-medium     { font-family: var(--ka-font-body); font-size: 14px; font-weight: 500; line-height: 1.5; color: var(--ka-color-text); }
+.ka-body-semibold   { font-family: var(--ka-font-body); font-size: 14px; font-weight: 600; line-height: 1.5; color: var(--ka-color-text); }
+
+.ka-small           { font-family: var(--ka-font-body); font-size: 12px; font-weight: 400; line-height: 1.4; color: var(--ka-color-text); }
+.ka-small-medium    { font-family: var(--ka-font-body); font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ka-color-text); }
+.ka-small-semibold  { font-family: var(--ka-font-body); font-size: 12px; font-weight: 600; line-height: 1.4; color: var(--ka-color-text); }
+
+.ka-caption         { font-family: var(--ka-font-body); font-size: 11px; font-weight: 400; line-height: 1.33; color: var(--ka-color-text-tertiary); }
+.ka-caption-medium  { font-family: var(--ka-font-body); font-size: 11px; font-weight: 500; line-height: 1.33; color: var(--ka-color-text-tertiary); }
+
+.ka-label {
+  font-family: var(--ka-font-body);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.33;
+  color: var(--ka-color-text-tertiary);
+}
+
+/* ─── Color Modifiers ────────────────────────────────────────────────────── */
+.ka-text-primary   { color: var(--ka-color-text); }
+.ka-text-secondary { color: var(--ka-color-text-secondary); }
+.ka-text-tertiary  { color: var(--ka-color-text-tertiary); }
+.ka-text-disabled  { color: var(--ka-color-text-disabled); }
+.ka-text-error     { color: var(--ka-color-error); }
+.ka-text-success   { color: var(--ka-color-success); }
+.ka-text-warning   { color: var(--ka-color-warning); }
+.ka-text-accent    { color: var(--ka-color-primary); }
+
+/* ─── Truncation helpers ─────────────────────────────────────────────────── */
+.ka-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ka-line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
