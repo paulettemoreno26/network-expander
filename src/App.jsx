@@ -24,13 +24,13 @@ export default function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--ka-color-bg-layout)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--ne-surface-base)' }}>
 
       {/* Nav — KA light mode */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, height: 56,
-        background: 'var(--ka-color-bg)',
-        borderBottom: '1px solid var(--ka-color-border)',
+        background: 'var(--ne-surface-card)',
+        borderBottom: '1px solid var(--ne-border)',
         display: 'flex', alignItems: 'center', padding: '0 28px',
         justifyContent: 'space-between', zIndex: 100,
       }}>
@@ -44,7 +44,7 @@ export default function App() {
             <rect fill="#141417" x="83.48" y="35.04" width="8.87" height="8.87"/>
             <polygon fill="#141417" points="69.98 96.47 81.34 96.47 61.06 66.49 51.65 66.49 58.34 59.26 79.52 35.19 68.17 35.19 39.12 67.86 39.12 35.19 29.73 35.19 29.73 96.47 39.12 96.47 39.12 80.49 50.39 67.84 69.98 96.47"/>
           </svg>
-          <div style={{ width: 1, height: 18, background: 'var(--ka-color-border)' }} />
+          <div style={{ width: 1, height: 18, background: 'var(--ne-border)' }} />
           <span style={{
             fontFamily: 'var(--ka-font-heading)', fontWeight: 500,
             fontSize: 14, color: 'var(--ka-color-text-secondary)',
@@ -65,27 +65,27 @@ export default function App() {
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '4px 10px 4px 6px',
                   borderRadius: 'var(--ka-radius-pill)',
-                  background: active ? 'var(--ka-color-primary)' : 'transparent',
-                  border: `1px solid ${active ? 'var(--ka-color-primary)' : 'var(--ka-color-border)'}`,
+                  background: active ? 'var(--ne-yellow)' : 'transparent',
+                  border: `1px solid ${active ? 'var(--ne-yellow)' : 'var(--ne-border)'}`,
                   transition: 'all 0.2s',
                 }}>
                   <div style={{
                     width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: active ? 'var(--ka-color-primary-text)' : done ? 'var(--ka-color-success)' : 'var(--ka-color-bg-layout)',
+                    background: active ? 'var(--ne-text)' : done ? 'var(--ne-positive)' : 'var(--ne-surface-base)',
                     fontSize: 9, fontWeight: 700,
-                    color: active ? 'var(--ka-color-primary)' : done ? 'var(--ka-color-bg)' : 'var(--ka-color-text-tertiary)',
+                    color: active ? 'var(--ne-yellow)' : done ? '#FFFFFF' : 'var(--ne-text-muted)',
                   }}>
                     {done ? '✓' : n}
                   </div>
                   <span style={{
                     fontSize: 12, fontWeight: active ? 700 : 500,
-                    color: active ? 'var(--ka-color-primary-text)' : done ? 'var(--ka-color-text-secondary)' : 'var(--ka-color-text-tertiary)',
+                    color: active ? 'var(--ne-text)' : done ? 'var(--ne-text-secondary)' : 'var(--ne-text-muted)',
                     fontFamily: 'var(--ka-font-body)',
                   }}>{s}</span>
                 </div>
                 {i < STEPS.length - 1 && (
-                  <div style={{ width: 16, height: 1, background: 'var(--ka-color-border)' }} />
+                  <div style={{ width: 16, height: 1, background: 'var(--ne-border)' }} />
                 )}
               </div>
             )

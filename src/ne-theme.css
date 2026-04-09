@@ -1,0 +1,56 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Network Expander — Product Theme
+   Sits on top of Kin DS base tokens. Every token has exactly one role.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── Actions (user-initiated) ──────────────────────────────────────────── */
+  /* Yellow = things the user clicks or has completed.                        */
+  /* CTAs, active step pill, SELECTED badge, Rule-of-3, dispatch confirm.    */
+  /* NEVER as background tint, NEVER on data, NEVER on passive elements.     */
+  --ne-yellow:       #E5FF01;
+  --ne-yellow-hover: #C8D900;
+
+  /* ── Intelligence (system-computed) ────────────────────────────────────── */
+  /* Violet = the product showing computed/recommended/synthesized info.      */
+  /* Success Estimate card, AI Rec accent, confidence %, projected metrics.  */
+  /* NEVER on user controls (buttons, chips), NEVER as selection state.      */
+  --ne-violet:      #7C73E6;
+  --ne-violet-deep: #6B63D4;
+
+  /* ── Depth surface ─────────────────────────────────────────────────────── */
+  /* Lilac wash = creating visual zones and layered panels.                   */
+  /* Behind secondary panels, subtle radial zones.                           */
+  /* NEVER on active/selected elements, NEVER as card bg for interactive.    */
+  --ne-violet-wash: #EDEAF5;
+
+  /* ── Semantic status ───────────────────────────────────────────────────── */
+  /* Green = outcome achieved, confirmed success.                            */
+  /* Amber = effort/cost signal, requires investment.                        */
+  --ne-positive:  #2A9D6E;
+  --ne-attention: #D4890A;
+
+  /* ── Neutrals (warm-shifted) ───────────────────────────────────────────── */
+  --ne-text:           #141417;
+  --ne-text-secondary: #555555;
+  --ne-text-muted:     #8A8F98;
+
+  --ne-surface-dark: #1C1F2E;
+  --ne-surface-base: #F4F2EF;
+  --ne-surface-card: #FFFFFF;
+
+  --ne-border:        #D5D0C8;
+  --ne-border-active: #141417;
+
+  /* ── Elevation ─────────────────────────────────────────────────────────── */
+  --ne-shadow-rest:     0 1px 2px rgba(0,0,0,0.04);
+  --ne-shadow-lifted:   0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  --ne-shadow-floating: 0 8px 24px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+
+  /* ── Transitions ───────────────────────────────────────────────────────── */
+  --ne-ease-color:  150ms ease;
+  --ne-ease-shadow: 200ms ease;
+  --ne-ease-layout: 250ms ease-out;
+  --ne-ease-fade:   200ms ease;
+}

@@ -194,7 +194,7 @@ function MapboxDiscoveryMap({ strategy, compMode }) {
 
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: 'mapbox://styles/mapbox/light-v11',
+      style: 'mapbox://styles/mapbox/dark-v11',
       center: [-100.325, 25.688],
       zoom: 12.5,
       interactive: true,
@@ -208,12 +208,12 @@ function MapboxDiscoveryMap({ strategy, compMode }) {
       map.addSource('routes', { type: 'geojson', data: GEO_ROUTES })
       map.addLayer({
         id: 'route-glow', type: 'line', source: 'routes',
-        paint: { 'line-color': '#141417', 'line-width': 18, 'line-opacity': 0, 'line-blur': 6 },
+        paint: { 'line-color': 'rgba(255,255,255,0.15)', 'line-width': 18, 'line-opacity': 0, 'line-blur': 6 },
       })
       map.addLayer({
         id: 'route-line', type: 'line', source: 'routes',
         layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: { 'line-color': '#141417', 'line-width': 2.5, 'line-opacity': 0.3 },
+        paint: { 'line-color': 'rgba(255,255,255,0.6)', 'line-width': 2.5, 'line-opacity': 0.3 },
       })
 
       // Other white space (ambient)
@@ -221,7 +221,7 @@ function MapboxDiscoveryMap({ strategy, compMode }) {
       map.addLayer({
         id: 'other-ws-dot', type: 'circle', source: 'other-ws',
         paint: {
-          'circle-radius': 3, 'circle-color': '#B8B3A8', 'circle-opacity': 0.4,
+          'circle-radius': 3, 'circle-color': '#666666', 'circle-opacity': 0.5,
           'circle-stroke-width': 0.8, 'circle-stroke-color': '#FFFFFF',
         },
       })
@@ -230,12 +230,12 @@ function MapboxDiscoveryMap({ strategy, compMode }) {
       map.addSource('density-ws', { type: 'geojson', data: GEO_DENSITY_WS })
       map.addLayer({
         id: 'density-ws-halo', type: 'circle', source: 'density-ws',
-        paint: { 'circle-radius': 18, 'circle-color': '#141417', 'circle-opacity': 0 },
+        paint: { 'circle-radius': 18, 'circle-color': '#E5FF01', 'circle-opacity': 0 },
       })
       map.addLayer({
         id: 'density-ws-dot', type: 'circle', source: 'density-ws',
         paint: {
-          'circle-radius': 4, 'circle-color': '#141417', 'circle-opacity': 0.4,
+          'circle-radius': 4, 'circle-color': '#E5FF01', 'circle-opacity': 0.4,
           'circle-stroke-width': 1.5, 'circle-stroke-color': '#FFFFFF',
         },
       })
@@ -245,7 +245,7 @@ function MapboxDiscoveryMap({ strategy, compMode }) {
       map.addLayer({
         id: 'cluster-ws-dot', type: 'circle', source: 'cluster-ws',
         paint: {
-          'circle-radius': 4, 'circle-color': '#141417', 'circle-opacity': 0.4,
+          'circle-radius': 4, 'circle-color': '#E5FF01', 'circle-opacity': 0.4,
           'circle-stroke-width': 1.5, 'circle-stroke-color': '#FFFFFF',
         },
       })
@@ -255,7 +255,7 @@ function MapboxDiscoveryMap({ strategy, compMode }) {
       map.addLayer({
         id: 'owned-pos-dot', type: 'circle', source: 'owned-pos',
         paint: {
-          'circle-radius': 6, 'circle-color': '#141417',
+          'circle-radius': 6, 'circle-color': '#FFFFFF',
           'circle-stroke-width': 1.5, 'circle-stroke-color': '#FFFFFF',
         },
       })
@@ -315,12 +315,13 @@ function StrategyCard({ id, data, selected, onSelect }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: active ? data.bg : '#FFFFFF',
-        border: `2px solid ${active ? data.color : 'var(--ka-color-border)'}`,
+        background: active ? data.bg : 'var(--ne-surface-card)',
+        border: `2px solid ${active ? data.color : 'var(--ne-border)'}`,
         borderRadius: '0.875rem', padding: '14px 16px',
-        cursor: 'pointer', transition: 'all 0.2s ease',
+        cursor: 'pointer', transition: 'all var(--ne-ease-shadow)',
         position: 'relative', overflow: 'hidden',
         flexShrink: 0,
+        boxShadow: active ? 'var(--ne-shadow-lifted)' : 'var(--ne-shadow-rest)',
       }}
     >
       {selected && (
@@ -348,32 +349,32 @@ function StrategyCard({ id, data, selected, onSelect }) {
         </div>
       </div>
 
-      <p style={{ fontSize: 11.5, color: 'var(--ka-color-text-secondary)', lineHeight: 1.55, margin: '0 0 12px' }}>
+      <p style={{ fontSize: 11.5, color: 'var(--ne-text-secondary)', lineHeight: 1.55, margin: '0 0 12px' }}>
         {data.description}
       </p>
 
       <div style={{
         display: 'flex', gap: 0,
         paddingTop: 10,
-        borderTop: '1px solid var(--ka-color-border)',
+        borderTop: '1px solid var(--ne-border)',
       }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 8.5, fontWeight: 600, color: 'var(--ka-color-text-tertiary)',
+          <div style={{ fontSize: 8.5, fontWeight: 600, color: 'var(--ne-text-muted)',
             textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 3 }}>
             Accounts
           </div>
-          <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--ka-color-text)',
+          <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--ne-text)',
             letterSpacing: '-0.03em', lineHeight: 1 }}>
             {data.stores}
           </div>
         </div>
-        <div style={{ width: 1, background: 'var(--ka-color-border)', margin: '0 14px' }} />
+        <div style={{ width: 1, background: 'var(--ne-border)', margin: '0 14px' }} />
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 8.5, fontWeight: 600, color: 'var(--ka-color-text-tertiary)',
+          <div style={{ fontSize: 8.5, fontWeight: 600, color: 'var(--ne-text-muted)',
             textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 3 }}>
             Net Volume
           </div>
-          <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--ka-color-text)',
+          <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--ne-violet)',
             letterSpacing: '-0.02em', lineHeight: 1, whiteSpace: 'nowrap' }}>
             {data.ucmo}
           </div>
@@ -388,8 +389,9 @@ function StrategyCard({ id, data, selected, onSelect }) {
 function AIRecommendation({ strategy }) {
   return (
     <div style={{
-      background: 'var(--ka-color-bg-layout)',
-      border: '1px solid var(--ka-color-border)',
+      background: 'var(--ne-surface-base)',
+      border: '1px solid var(--ne-border)',
+      borderLeft: '3px solid var(--ne-violet)',
       borderRadius: '0.75rem', padding: '12px 14px',
       flexShrink: 0,
     }}>
@@ -408,19 +410,19 @@ function AIRecommendation({ strategy }) {
         <span style={{
           fontSize: 9.5, fontWeight: 700, letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          color: 'var(--ka-color-text)',
+          color: 'var(--ne-violet)',
         }}>
           AI Recommendation
         </span>
       </div>
       {strategy ? (
-        <p style={{ fontSize: 11.5, color: 'var(--ka-color-text)', lineHeight: 1.6, margin: 0 }}>
+        <p style={{ fontSize: 11.5, color: 'var(--ne-text)', lineHeight: 1.6, margin: 0 }}>
           {strategy === 'clusters'
             ? 'High-Potential Clusters give you the highest-ceiling accounts in the city. Route redesign required — the volume justifies the move.'
             : 'Density Fill is your fastest path to new volume — accounts are steps from your existing routes. No new trucks, no route changes needed.'}
         </p>
       ) : (
-        <p style={{ fontSize: 11, color: 'var(--ka-color-text-tertiary)', lineHeight: 1.55, margin: 0 }}>
+        <p style={{ fontSize: 11, color: 'var(--ne-text-muted)', lineHeight: 1.55, margin: 0 }}>
           Select a strategy to see where your territory opportunity is.
         </p>
       )}
@@ -432,18 +434,18 @@ function AIRecommendation({ strategy }) {
 
 function MapLegend({ strategy }) {
   const items = [
-    { color: '#141417', label: 'Owned POS', r: 5 },
-    { color: strategy ? '#141417' : '#999ea6',
+    { color: '#FFFFFF', label: 'Owned POS', r: 5 },
+    { color: strategy ? '#E5FF01' : '#999ea6',
       label: strategy === 'density' ? 'Density targets'
            : strategy === 'clusters' ? 'High-value clusters'
            : 'White spaces', r: 4 },
-    { color: '#999ea6', label: 'Other white space', r: 3 },
+    { color: '#666666', label: 'Other white space', r: 3 },
   ]
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 14,
-      background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)',
-      border: '1px solid rgba(0,0,0,0.08)', borderRadius: '0.5rem',
+      background: 'rgba(28,31,46,0.85)', backdropFilter: 'blur(4px)',
+      border: '1px solid rgba(255,255,255,0.12)', borderRadius: '0.5rem',
       padding: '6px 12px',
     }}>
       {items.map((item, i) => (
@@ -452,7 +454,7 @@ function MapLegend({ strategy }) {
             width: item.r * 2, height: item.r * 2, borderRadius: '50%',
             background: item.color, flexShrink: 0,
           }} />
-          <span style={{ fontSize: 10, color: 'var(--ka-color-text-secondary)', fontWeight: 500, whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 10, color: 'var(--ne-text-secondary)', fontWeight: 500, whiteSpace: 'nowrap' }}>
             {item.label}
           </span>
         </div>
@@ -481,37 +483,37 @@ export default function Step2Discovery({
     <div style={{
       height: 'calc(100vh - 56px)',
       display: 'flex', flexDirection: 'column',
-      overflow: 'hidden', background: 'var(--ka-color-bg-layout)',
+      overflow: 'hidden', background: 'var(--ne-surface-base)',
     }}>
 
       {/* ── Compact header ── */}
       <div style={{
         flexShrink: 0,
-        background: 'var(--ka-color-bg)', borderBottom: '1px solid var(--ka-color-border)',
+        background: 'var(--ne-surface-card)', borderBottom: '1px solid var(--ne-border)',
         padding: '10px 28px 0',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
           <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--ka-color-text-tertiary)',
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--ne-text-muted)',
               letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2 }}>
               Step 2 — Discovery
             </div>
-            <h1 style={{ fontSize: 19, fontWeight: 800, color: 'var(--ka-color-text)',
+            <h1 style={{ fontSize: 19, fontWeight: 800, color: 'var(--ne-text)',
               letterSpacing: '-0.02em', margin: 0 }}>
               Choose your conquest strategy
             </h1>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
             <button onClick={onBack} style={{
-              background: 'transparent', color: 'var(--ka-color-text-secondary)',
-              border: '1px solid var(--ka-color-border)', borderRadius: 'var(--ka-radius)',
+              background: 'transparent', color: 'var(--ne-text-secondary)',
+              border: '1px solid var(--ne-border)', borderRadius: 'var(--ka-radius)',
               padding: '6px 13px', fontSize: 12.5, cursor: 'pointer',
             }}>
               ← Back
             </button>
             <button onClick={onNext} disabled={!strategy} style={{
-              background: strategy ? 'var(--ka-color-primary)' : 'var(--ka-color-bg-layout)',
-              color: strategy ? 'var(--ka-color-primary-text)' : 'var(--ka-color-text-disabled)',
+              background: strategy ? 'var(--ne-yellow)' : 'var(--ne-surface-base)',
+              color: strategy ? 'var(--ne-text)' : 'var(--ne-text-muted)',
               fontWeight: 700, padding: '6px 16px',
               borderRadius: 'var(--ka-radius-pill)', border: 'none',
               fontSize: 12.5, cursor: strategy ? 'pointer' : 'not-allowed',
@@ -533,7 +535,7 @@ export default function Step2Discovery({
         <div style={{
           width: '30%', flexShrink: 0,
           padding: '14px 18px',
-          borderRight: '1px solid var(--ka-color-border)',
+          borderRight: '1px solid var(--ne-border)',
           display: 'flex', flexDirection: 'column', gap: 10,
           overflowY: 'auto',
         }}>
@@ -557,7 +559,7 @@ export default function Step2Discovery({
             flex: 1, position: 'relative', minHeight: 0,
             borderRadius: '0.875rem',
             overflow: 'hidden',
-            border: '1px solid #D9D5CB',
+            border: '1px solid rgba(255,255,255,0.08)',
             boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
           }}>
             <MapboxDiscoveryMap strategy={strategy} compMode={compMode} />
@@ -567,16 +569,16 @@ export default function Step2Discovery({
               position: 'absolute', top: 10, right: 10,
               display: 'flex', alignItems: 'center', gap: 5,
               background: 'rgba(255,255,255,0.94)',
-              border: '1px solid var(--ka-color-border)',
+              border: '1px solid var(--ne-border)',
               borderRadius: '0.4rem', padding: '5px 10px',
               boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
               zIndex: 10,
             }}>
               <div style={{
                 width: 6, height: 6, borderRadius: '50%',
-                background: 'var(--ka-color-text)', flexShrink: 0,
+                background: 'var(--ne-violet)', flexShrink: 0,
               }} />
-              <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--ka-color-text)' }}>
+              <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--ne-violet)' }}>
                 98.4% Match Confidence
               </span>
             </div>
@@ -588,10 +590,10 @@ export default function Step2Discovery({
                 style={{
                   display: 'flex', alignItems: 'center', gap: 5,
                   background: compMode ? '#141417' : 'rgba(255,255,255,0.94)',
-                  border: `1px solid ${compMode ? '#141417' : 'var(--ka-color-border)'}`,
+                  border: `1px solid ${compMode ? '#141417' : 'var(--ne-border)'}`,
                   borderRadius: '0.4rem', padding: '5px 10px',
                   cursor: 'pointer', fontSize: 10.5, fontWeight: 600,
-                  color: compMode ? '#FFFFFF' : 'var(--ka-color-text)',
+                  color: compMode ? '#FFFFFF' : 'var(--ne-text)',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
                   transition: 'all 0.15s',
                 }}
@@ -617,15 +619,15 @@ export default function Step2Discovery({
                 pointerEvents: 'none', zIndex: 10,
               }}>
                 <div style={{
-                  background: 'rgba(255,255,255,0.88)',
-                  border: '1px solid var(--ka-color-border)',
+                  background: 'rgba(28,31,46,0.85)',
+                  border: '1px solid rgba(255,255,255,0.12)',
                   borderRadius: '0.75rem', padding: '14px 22px',
                   textAlign: 'center',
                 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ka-color-text)', marginBottom: 4 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF', marginBottom: 4 }}>
                     Pick a strategy to reveal your territory
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--ka-color-text-tertiary)' }}>
+                  <div style={{ fontSize: 11, color: 'var(--ne-text-muted)' }}>
                     Select Density Fill or High-Potential Clusters
                   </div>
                 </div>

@@ -5,13 +5,12 @@ import { DENSITY_WS, CLUSTER_WS, TIER_META, ROUTE_META } from './Step2Discovery.
 const STRATEGY_POOLS = { density: DENSITY_WS, clusters: CLUSTER_WS }
 
 const STRATEGY_META = {
-  density:  { label: 'Density Fill',            color: '#141417', bg: '#F2F2F2', border: '#d4d5d6' },
-  clusters: { label: 'High-Potential Clusters',  color: '#141417', bg: '#F2F2F2', border: '#d4d5d6' },
+  density:  { label: 'Density Fill' },
+  clusters: { label: 'High-Potential Clusters' },
 }
 
 const CHANNEL_LABELS = { traditional: 'Traditional', modern: 'Modern' }
 
-// Mission time: travel (6 min/km) + dwell (8 min/account)
 function getMissionMinutes(stores) {
   const travel = stores.reduce((sum, s) => sum + s.distance, 0) / 1000 * 6
   const dwell  = stores.length * 8
@@ -32,7 +31,6 @@ function getStoresInReach(pool, tierFilter, routeFilter, routeDeviation) {
   )
 }
 
-// Phase definitions — week ranges derived from persistence (cycle weeks)
 function buildPhases(cycleWeeks) {
   const w = cycleWeeks
   return {
@@ -40,24 +38,24 @@ function buildPhases(cycleWeeks) {
       label:     'Phase 1: First Drop',
       timeline:  w === 1 ? 'Week 1' : `Weeks 1–${w}`,
       badge:     '1',
-      color:     '#141417',
-      bg:        '#F2F2F2',
+      color:     'var(--ne-attention)',
+      bg:        'rgba(212,137,10,0.1)',
       directive: 'Get the shelf. One product, minimum facing. Introduce yourself and leave the door open — don\'t oversell on the first visit.',
     },
     2: {
       label:     'Phase 2: Re-order',
       timeline:  w === 1 ? 'Week 2' : `Weeks ${w + 1}–${w * 2}`,
       badge:     '2',
-      color:     '#444444',
-      bg:        '#F2F2F2',
+      color:     'var(--ne-text-secondary)',
+      bg:        'var(--ne-surface-base)',
       directive: 'Reinforce the relationship. Validate shelf placement, compare rotation to neighboring accounts. Introduce a second SKU if reception was positive.',
     },
     3: {
       label:     'Phase 3: Active Account',
       timeline:  w === 1 ? 'Week 3+' : `Week ${w * 2 + 1}+`,
       badge:     '3',
-      color:     '#141417',
-      bg:        '#E5FF01',
+      color:     'var(--ne-text)',
+      bg:        'var(--ne-yellow)',
       directive: 'Account active. Move to standard route coverage.',
     },
   }
@@ -73,7 +71,6 @@ function getOpeningArgument(strategy, channel, avgPotential) {
 
 const MARGIN = 0.255
 
-// Build WhatsApp share text
 function buildWhatsAppText(active, meta, totalPotential, monthlyRevenue, assignedRoutes, missionMins) {
   const lines = [
     `📋 *Hunting Brief — ${meta.label}*`,
@@ -114,7 +111,6 @@ export default function Step4Dispatch({
   const avgPotential   = Math.round(totalPotential / (active.length || 1))
   const missionMins    = getMissionMinutes(active)
 
-  // Derive assigned routes from active accounts
   const assignedRoutes = [...new Set(active.map(s => s.route))]
     .map(r => ({ route: r, supervisor: ROUTE_META[r]?.supervisor || '—' }))
     .sort((a, b) => a.route.localeCompare(b.route))
@@ -132,34 +128,33 @@ export default function Step4Dispatch({
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '48px 32px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32 }}>
           <div style={{
-            width: 48, height: 48, background: '#E5FF01', border: '2px solid #141417',
+            width: 48, height: 48, background: 'var(--ne-yellow)', border: '2px solid var(--ne-text)',
             borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <polyline points="4,11 9,16 18,7" stroke="#141417" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <polyline points="4,11 9,16 18,7" stroke="var(--ne-text)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--ka-color-text)', letterSpacing: '-0.01em' }}>Mission Dispatched</div>
-            <div style={{ fontSize: 13, color: 'var(--ka-color-text-secondary)', marginTop: 2 }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--ne-text)', letterSpacing: '-0.01em', fontFamily: 'var(--ka-font-heading)' }}>Mission Dispatched</div>
+            <div style={{ fontSize: 13, color: 'var(--ne-text-secondary)', marginTop: 2 }}>
               {active.length} accounts · {meta.label} · All at Phase 1
             </div>
           </div>
         </div>
 
-        {/* Journey tracker table */}
-        <div style={{ background: 'var(--ka-color-bg)', border: '1px solid var(--ka-color-border)', borderRadius: 'var(--ka-radius-lg)', overflow: 'hidden', marginBottom: 20 }}>
-          <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--ka-color-border)', background: 'var(--ka-color-bg-layout)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ka-color-text)' }}>Account Progress</div>
-            <div style={{ fontSize: 12, color: 'var(--ka-color-text-tertiary)' }}>Updated per route cycle</div>
+        <div style={{ background: 'var(--ne-surface-card)', border: '1px solid var(--ne-border)', borderRadius: 'var(--ka-radius-lg)', overflow: 'hidden', marginBottom: 20, boxShadow: 'var(--ne-shadow-rest)' }}>
+          <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--ne-border)', background: 'var(--ne-surface-base)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ne-text)' }}>Account Progress</div>
+            <div style={{ fontSize: 12, color: 'var(--ne-text-muted)' }}>Updated per route cycle</div>
           </div>
 
           <div style={{
             display: 'grid', gridTemplateColumns: '1fr 140px 200px 1fr',
-            padding: '8px 20px', borderBottom: '1px solid var(--ka-color-border)',
+            padding: '8px 20px', borderBottom: '1px solid var(--ne-border)',
           }}>
             {['Account', 'Strategy', 'Current Status', 'Next Action'].map(h => (
-              <div key={h} style={{ fontSize: 10, fontWeight: 600, color: 'var(--ka-color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</div>
+              <div key={h} style={{ fontSize: 10, fontWeight: 600, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</div>
             ))}
           </div>
 
@@ -168,14 +163,14 @@ export default function Step4Dispatch({
             return (
               <div key={store.id} style={{
                 display: 'grid', gridTemplateColumns: '1fr 140px 200px 1fr',
-                padding: '13px 20px', borderTop: i > 0 ? '1px solid var(--ka-color-border)' : undefined,
+                padding: '13px 20px', borderTop: i > 0 ? '1px solid var(--ne-border)' : undefined,
                 alignItems: 'center',
               }}>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ka-color-text)' }}>{store.name}</div>
-                  <div style={{ fontSize: 11, color: 'var(--ka-color-text-tertiary)', marginTop: 2 }}>+{store.potential} UC/wk potential</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ne-text)' }}>{store.name}</div>
+                  <div style={{ fontSize: 11, color: 'var(--ne-text-muted)', marginTop: 2 }}>+{store.potential} UC/wk potential</div>
                 </div>
-                <div style={{ fontSize: 12, color: 'var(--ka-color-text)', fontWeight: 600 }}>{meta.label}</div>
+                <div style={{ fontSize: 12, color: 'var(--ne-text)', fontWeight: 600 }}>{meta.label}</div>
                 <div>
                   <span style={{
                     display: 'inline-flex', alignItems: 'center', gap: 5,
@@ -185,13 +180,13 @@ export default function Step4Dispatch({
                     {phase.badge} {phase.label}
                   </span>
                 </div>
-                <div style={{ fontSize: 12, color: 'var(--ka-color-text-secondary)', lineHeight: 1.5 }}>{phase.directive}</div>
+                <div style={{ fontSize: 12, color: 'var(--ne-text-secondary)', lineHeight: 1.5 }}>{phase.directive}</div>
               </div>
             )
           })}
         </div>
 
-        <div style={{ fontSize: 12, color: 'var(--ka-color-text-tertiary)', lineHeight: 1.6 }}>
+        <div style={{ fontSize: 12, color: 'var(--ne-text-muted)', lineHeight: 1.6 }}>
           Status updates when orders are confirmed. An account becomes active after 3 consecutive confirmed orders and moves to standard route coverage.
         </div>
       </div>
@@ -199,7 +194,7 @@ export default function Step4Dispatch({
   }
 
   // ── Pre-dispatch: Hunting Brief ──────────────────────────────────────────────
-  const card = { background: 'var(--ka-color-bg)', border: '1px solid var(--ka-color-border)', borderRadius: 'var(--ka-radius-lg)' }
+  const card = { background: 'var(--ne-surface-card)', border: '1px solid var(--ne-border)', borderRadius: 'var(--ka-radius-lg)', boxShadow: 'var(--ne-shadow-rest)' }
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -207,33 +202,35 @@ export default function Step4Dispatch({
       {/* Sticky header */}
       <div style={{
         position: 'sticky', top: 56, zIndex: 40,
-        background: 'var(--ka-color-bg-layout)', paddingBottom: 12, marginBottom: 4,
-        borderBottom: '1px solid var(--ka-color-border)',
+        background: 'var(--ne-surface-base)', paddingBottom: 12, marginBottom: 4,
+        borderBottom: '1px solid var(--ne-border)',
       }}>
         <div style={{ padding: '16px 32px 0', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--ka-color-text-tertiary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--ne-text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>
               Step 4 — Dispatch
             </div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--ka-color-text)', letterSpacing: '-0.02em', margin: 0 }}>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--ne-text)', letterSpacing: '-0.02em', margin: 0, fontFamily: 'var(--ka-font-heading)' }}>
               Hunting Brief
             </h1>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', paddingTop: 4, flexShrink: 0 }}>
             <button onClick={onBack} style={{
-              background: 'transparent', color: 'var(--ka-color-text-secondary)',
-              border: '1px solid var(--ka-color-border)', borderRadius: 'var(--ka-radius)',
+              background: 'transparent', color: 'var(--ne-text-secondary)',
+              border: '1px solid var(--ne-border)', borderRadius: 'var(--ka-radius)',
               padding: '8px 14px', fontSize: 13, cursor: 'pointer',
+              fontFamily: 'var(--ka-font-body)',
             }}>
               ← Back
             </button>
             <button
               onClick={() => window.print()}
               style={{
-                background: 'transparent', color: 'var(--ka-color-text-secondary)',
-                border: '1px solid var(--ka-color-border)', borderRadius: 'var(--ka-radius)',
+                background: 'transparent', color: 'var(--ne-text-secondary)',
+                border: '1px solid var(--ne-border)', borderRadius: 'var(--ka-radius)',
                 padding: '8px 14px', fontSize: 13, cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: 6,
+                fontFamily: 'var(--ka-font-body)',
               }}
             >
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
@@ -249,10 +246,11 @@ export default function Step4Dispatch({
               rel="noopener noreferrer"
               style={{
                 background: '#25D366', color: '#FFFFFF',
-                border: 'none', borderRadius: '0.5rem',
+                border: 'none', borderRadius: 'var(--ka-radius)',
                 padding: '8px 14px', fontSize: 13, cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: 6,
                 textDecoration: 'none', fontWeight: 600,
+                fontFamily: 'var(--ka-font-body)',
               }}
             >
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
@@ -268,8 +266,12 @@ export default function Step4Dispatch({
         </div>
       </div>
 
-      {/* Mission value bar */}
-      <div style={{ margin: '0 32px 20px', padding: '18px 24px', background: 'var(--ka-color-bg)', border: '1px solid var(--ka-color-border)', borderRadius: 'var(--ka-radius-lg)', display: 'flex', gap: 0, alignItems: 'stretch', flexWrap: 'wrap' }}>
+      {/* Mission value bar — dark surface */}
+      <div style={{
+        margin: '0 32px 20px', padding: '18px 24px',
+        background: 'var(--ne-surface-dark)', borderRadius: 'var(--ka-radius-lg)',
+        display: 'flex', gap: 0, alignItems: 'stretch', flexWrap: 'wrap',
+      }}>
         {[
           { label: 'Target Accounts',               value: active.length,               unit: null },
           { label: 'Volume Potential',               value: `+${totalPotential}`,        unit: 'UC/wk' },
@@ -278,12 +280,12 @@ export default function Step4Dispatch({
           { label: 'To Activate an Account',         value: '3',                         unit: 'confirmed orders' },
         ].map((kpi, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'stretch' }}>
-            {i > 0 && <div style={{ width: 1, background: 'var(--ka-color-border)', margin: '0 28px', alignSelf: 'stretch' }} />}
+            {i > 0 && <div style={{ width: 1, background: 'rgba(255,255,255,0.1)', margin: '0 28px', alignSelf: 'stretch' }} />}
             <div>
-              <div style={{ fontSize: 10, color: 'var(--ka-color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{kpi.label}</div>
-              <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--ka-color-text)', lineHeight: 1 }}>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{kpi.label}</div>
+              <div style={{ fontSize: 28, fontWeight: 800, color: '#FFFFFF', lineHeight: 1, fontFamily: 'var(--ka-font-heading)' }}>
                 {kpi.value}
-                {kpi.unit && <span style={{ fontSize: 13, fontWeight: 400, color: 'var(--ka-color-text-tertiary)', marginLeft: 4 }}>{kpi.unit}</span>}
+                {kpi.unit && <span style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.45)', marginLeft: 4 }}>{kpi.unit}</span>}
               </div>
             </div>
           </div>
@@ -298,7 +300,7 @@ export default function Step4Dispatch({
 
           {/* Assigned Routes */}
           <div style={{ ...card, padding: '16px 20px' }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--ka-color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
               Assigned To
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -307,20 +309,20 @@ export default function Step4Dispatch({
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{
                       width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-                      background: 'var(--ka-color-bg-layout)', border: '1px solid var(--ka-color-border)',
+                      background: 'var(--ne-surface-base)', border: '1px solid var(--ne-border)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                        <circle cx="6" cy="4" r="2.2" stroke="#141417" strokeWidth="1.2" />
-                        <path d="M2 10c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="#141417" strokeWidth="1.2" strokeLinecap="round" />
+                        <circle cx="6" cy="4" r="2.2" stroke="var(--ne-text)" strokeWidth="1.2" />
+                        <path d="M2 10c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="var(--ne-text)" strokeWidth="1.2" strokeLinecap="round" />
                       </svg>
                     </div>
                     <div>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ka-color-text)' }}>{supervisor}</div>
-                      <div style={{ fontSize: 10.5, color: 'var(--ka-color-text-tertiary)' }}>{route}</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ne-text)' }}>{supervisor}</div>
+                      <div style={{ fontSize: 10.5, color: 'var(--ne-text-muted)' }}>{route}</div>
                     </div>
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--ka-color-text-tertiary)' }}>
+                  <div style={{ fontSize: 11, color: 'var(--ne-text-muted)' }}>
                     {active.filter(s => s.route === route).length} accounts
                   </div>
                 </div>
@@ -328,46 +330,50 @@ export default function Step4Dispatch({
             </div>
           </div>
 
-          {/* Opening Argument */}
-          <div style={{ ...card, borderLeft: '3px solid #141417', padding: '20px 22px' }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--ka-color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
-              Opening Argument
+          {/* Opening Argument — violet left border = system-derived content */}
+          <div style={{ ...card, borderLeft: '3px solid var(--ne-violet)', padding: '20px 22px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Opening Argument
+              </div>
+              <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--ne-violet)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>AI-Generated</span>
             </div>
-            <div style={{ fontSize: 14, color: 'var(--ka-color-text)', lineHeight: 1.65, fontStyle: 'italic' }}>
+            <div style={{ fontSize: 14, color: 'var(--ne-text)', lineHeight: 1.65, fontStyle: 'italic' }}>
               "{opening}"
             </div>
-            <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--ka-color-border)', fontSize: 12, color: 'var(--ka-color-text-tertiary)' }}>
+            <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--ne-border)', fontSize: 12, color: 'var(--ne-text-muted)' }}>
               Based on volume benchmarks against similar active accounts in the same micro-zones · {CHANNEL_LABELS[channel] || channel}
             </div>
           </div>
 
-          {/* Rep Instructions by Phase — dynamic based on cycle */}
+          {/* Rep Instructions by Phase */}
           <div style={{ ...card, padding: '20px 22px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--ka-color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 Rep Instructions by Phase
               </div>
-              <div style={{ fontSize: 10, color: 'var(--ka-color-text-tertiary)', background: 'var(--ka-color-bg-layout)', borderRadius: 4, padding: '2px 7px' }}>
+              <div style={{ fontSize: 10, color: 'var(--ne-text-muted)', background: 'var(--ne-surface-base)', borderRadius: 4, padding: '2px 7px' }}>
                 {cycleWeeks}-week cycle
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {[1, 2, 3].map(n => {
                 const ph = PHASES[n]
+                const isYellow = n === 3
                 return (
                   <div key={n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                     <span style={{
                       flexShrink: 0, width: 28, height: 28, borderRadius: '50%',
-                      background: ph.bg, border: `1px solid ${ph.color === '#E5FF01' ? '#141417' : 'var(--ka-color-border)'}`,
+                      background: ph.bg, border: `1px solid ${isYellow ? 'var(--ne-text)' : 'var(--ne-border)'}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 11, fontWeight: 800, color: ph.color === '#E5FF01' ? '#141417' : ph.color,
+                      fontSize: 11, fontWeight: 800, color: isYellow ? 'var(--ne-text)' : ph.color,
                     }}>{n}</span>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ka-color-text)' }}>{ph.label}</div>
-                        <div style={{ fontSize: 10, color: 'var(--ka-color-text-tertiary)', background: 'var(--ka-color-bg-layout)', borderRadius: 3, padding: '1px 6px' }}>{ph.timeline}</div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ne-text)' }}>{ph.label}</div>
+                        <div style={{ fontSize: 10, color: 'var(--ne-text-muted)', background: 'var(--ne-surface-base)', borderRadius: 3, padding: '1px 6px' }}>{ph.timeline}</div>
                       </div>
-                      <div style={{ fontSize: 12, color: 'var(--ka-color-text-secondary)', lineHeight: 1.55 }}>{ph.directive}</div>
+                      <div style={{ fontSize: 12, color: 'var(--ne-text-secondary)', lineHeight: 1.55 }}>{ph.directive}</div>
                     </div>
                   </div>
                 )
@@ -379,9 +385,9 @@ export default function Step4Dispatch({
         {/* RIGHT — Target stores + CTA */}
         <div>
           <div style={{ ...card, overflow: 'hidden', marginBottom: 14 }}>
-            <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--ka-color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ka-color-text)' }}>Target Accounts</div>
-              <div style={{ fontSize: 12, color: 'var(--ka-color-text-tertiary)' }}>
+            <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--ne-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ne-text)' }}>Target Accounts</div>
+              <div style={{ fontSize: 12, color: 'var(--ne-text-muted)' }}>
                 {active.length} of {stores.length} included · Uncheck to remove
               </div>
             </div>
@@ -394,18 +400,18 @@ export default function Step4Dispatch({
                   key={store.id}
                   onClick={() => toggleExclude(store.id)}
                   style={{
-                    padding: '11px 20px', borderTop: i > 0 ? '1px solid var(--ka-color-border)' : undefined,
+                    padding: '11px 20px', borderTop: i > 0 ? '1px solid var(--ne-border)' : undefined,
                     display: 'flex', alignItems: 'center', gap: 12,
                     opacity: excluded ? 0.4 : 1, cursor: 'pointer',
-                    transition: 'opacity 0.15s',
+                    transition: 'opacity var(--ne-ease-color)',
                   }}
                 >
                   <div style={{
                     width: 16, height: 16, borderRadius: 3, flexShrink: 0,
-                    border: `1px solid ${!excluded ? '#141417' : 'var(--ka-color-border)'}`,
-                    background: !excluded ? '#141417' : 'var(--ka-color-bg)',
+                    border: `1px solid ${!excluded ? 'var(--ne-text)' : 'var(--ne-border)'}`,
+                    background: !excluded ? 'var(--ne-text)' : 'var(--ne-surface-card)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'all 0.15s',
+                    transition: 'all var(--ne-ease-color)',
                   }}>
                     {!excluded && (
                       <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
@@ -415,26 +421,26 @@ export default function Step4Dispatch({
                   </div>
 
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, color: 'var(--ka-color-text)', fontWeight: 500, textDecoration: excluded ? 'line-through' : 'none' }}>
+                    <div style={{ fontSize: 13, color: 'var(--ne-text)', fontWeight: 500, textDecoration: excluded ? 'line-through' : 'none' }}>
                       {store.name}
                     </div>
-                    {rep && <div style={{ fontSize: 10.5, color: 'var(--ka-color-text-tertiary)', marginTop: 1 }}>{store.route} · {rep}</div>}
+                    {rep && <div style={{ fontSize: 10.5, color: 'var(--ne-text-muted)', marginTop: 1 }}>{store.route} · {rep}</div>}
                   </div>
 
-                  <div style={{ fontSize: 12, fontWeight: 700, color: excluded ? 'var(--ka-color-text-tertiary)' : 'var(--ka-color-text)', flexShrink: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: excluded ? 'var(--ne-text-muted)' : 'var(--ne-violet)', flexShrink: 0 }}>
                     +{store.potential} UC/wk
                   </div>
                 </div>
               )
             })}
 
-            <div style={{ padding: '12px 20px', borderTop: '1px solid var(--ka-color-border)', background: 'var(--ka-color-bg-layout)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: 12, color: 'var(--ka-color-text-tertiary)' }}>
+            <div style={{ padding: '12px 20px', borderTop: '1px solid var(--ne-border)', background: 'var(--ne-surface-base)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 12, color: 'var(--ne-text-muted)' }}>
                 {excludedStores.filter(id => stores.some(s => s.id === id)).length > 0
                   ? `${excludedStores.filter(id => stores.some(s => s.id === id)).length} account(s) removed`
                   : 'All accounts included'}
               </div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ka-color-text)' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ne-text)' }}>
                 +{totalPotential} UC/wk confirmed
               </div>
             </div>
@@ -444,27 +450,29 @@ export default function Step4Dispatch({
             onClick={() => setDispatched(true)}
             disabled={active.length === 0}
             style={{
-              width: '100%', background: active.length > 0 ? 'var(--ka-color-primary)' : 'var(--ka-color-bg-layout)',
-              color: active.length > 0 ? 'var(--ka-color-primary-text)' : 'var(--ka-color-text-disabled)',
+              width: '100%',
+              background: active.length > 0 ? 'var(--ne-yellow)' : 'var(--ne-surface-base)',
+              color: active.length > 0 ? 'var(--ne-text)' : 'var(--ne-text-muted)',
               fontWeight: 700, padding: '14px', borderRadius: 'var(--ka-radius-pill)',
               border: 'none', cursor: active.length > 0 ? 'pointer' : 'not-allowed',
               fontSize: 14, marginBottom: 10,
-              transition: 'background 0.15s',
+              fontFamily: 'var(--ka-font-body)',
+              transition: 'background var(--ne-ease-color)',
             }}
           >
             Dispatch Hunting Mission →
           </button>
           <button style={{
-            width: '100%', background: 'transparent', color: 'var(--ka-color-text-secondary)',
-            border: '1px solid var(--ka-color-border)', borderRadius: 'var(--ka-radius)',
+            width: '100%', background: 'transparent', color: 'var(--ne-text-secondary)',
+            border: '1px solid var(--ne-border)', borderRadius: 'var(--ka-radius)',
             padding: '11px', fontSize: 13, cursor: 'pointer',
+            fontFamily: 'var(--ka-font-body)',
           }}>
             Save as Draft
           </button>
         </div>
       </div>
 
-      {/* Print styles */}
       <style>{`
         @media print {
           body > *:not(#root) { display: none; }
