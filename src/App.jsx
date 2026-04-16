@@ -4,23 +4,31 @@ import Step2Discovery from './components/Step2Discovery.jsx'
 import Step3Calibrate from './components/Step3Calibrate.jsx'
 import Step4Dispatch from './components/Step4Dispatch.jsx'
 
-const STEPS = ['Intent', 'Discovery', 'Calibrate', 'Dispatch']
+const STEPS = ['Intent', 'Discovery', 'Calibrate', 'Activate']
 
 export default function App() {
   const [step, setStep] = useState(1)
   const [city, setCity] = useState(null)
   const [channel, setChannel] = useState(null)
   const [strategy, setStrategy] = useState(null)
-  const [tierFilter, setTierFilter] = useState(['gold', 'silver', 'bronze'])
+  const [tierFilter, setTierFilter] = useState(['gold', 'silver', 'bronze', 'iron'])
   const [routeFilter, setRouteFilter] = useState(['Route 4', 'Route 2', 'Route 1'])
   const [routeDeviation, setRouteDeviation] = useState(1000)
   const [persistence, setPersistence] = useState(3)
   const [excludedStores, setExcludedStores] = useState([])
+  const [businessCategory, setBusinessCategory] = useState([])
+  const [waysOfReaching, setWaysOfReaching] = useState(['phone', 'in-person'])
+  const [extraPosPerDay, setExtraPosPerDay] = useState(3)
+  const [numPeople, setNumPeople] = useState(2)
 
   function handleSetStrategy(s) {
     setStrategy(s)
     setExcludedStores([])
+    setWaysOfReaching(s === 'clusters' ? ['phone', 'in-person'] : [])
+    setExtraPosPerDay(3)
+    setNumPeople(2)
     // tier/route filters are set by Step2Discovery.handleSelect based on the chosen pool
+    // businessCategory is initialized when Step3 mounts based on available categories
   }
 
   return (
@@ -54,45 +62,53 @@ export default function App() {
         </div>
 
         {/* Step indicators */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
           {STEPS.map((s, i) => {
             const n = i + 1
             const active = step === n
             const done = step > n
             return (
-              <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div key={s} style={{ display: 'flex', alignItems: 'center' }}>
+                {/* Connector line */}
+                {i > 0 && (
+                  <div style={{
+                    width: 28, height: 2,
+                    background: done || active ? 'var(--ne-text)' : 'var(--ne-border)',
+                    borderRadius: 1,
+                    transition: 'background 0.3s ease',
+                  }} />
+                )}
                 <div style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '4px 10px 4px 6px',
-                  borderRadius: 'var(--ka-radius-pill)',
+                  display: 'flex', alignItems: 'center', gap: 7,
+                  padding: active ? '5px 14px 5px 5px' : '5px 10px 5px 5px',
+                  borderRadius: 100,
                   background: active ? 'var(--ne-yellow)' : 'transparent',
-                  border: `1px solid ${active ? 'var(--ne-yellow)' : 'var(--ne-border)'}`,
-                  transition: 'all 0.2s',
+                  boxShadow: active ? '0 2px 10px rgba(229,255,1,0.3)' : 'none',
+                  transition: 'all 0.25s ease',
                 }}>
                   <div style={{
-                    width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
+                    width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: active ? 'var(--ne-text)' : done ? 'var(--ne-positive)' : 'var(--ne-surface-base)',
-                    fontSize: 9, fontWeight: 700,
-                    color: active ? 'var(--ne-yellow)' : done ? '#FFFFFF' : 'var(--ne-text-muted)',
+                    background: active ? 'var(--ne-text)' : done ? 'var(--ne-text)' : 'var(--ne-surface-base)',
+                    fontSize: 10, fontWeight: 700,
+                    color: active ? 'var(--ne-yellow)' : done ? 'var(--ne-yellow)' : 'var(--ne-text-muted)',
+                    transition: 'all 0.25s ease',
                   }}>
                     {done ? '✓' : n}
                   </div>
                   <span style={{
-                    fontSize: 12, fontWeight: active ? 700 : 500,
-                    color: active ? 'var(--ne-text)' : done ? 'var(--ne-text-secondary)' : 'var(--ne-text-muted)',
+                    fontSize: 12.5, fontWeight: active ? 700 : 500,
+                    color: active ? 'var(--ne-text)' : done ? 'var(--ne-text)' : 'var(--ne-text-muted)',
                     fontFamily: 'var(--ka-font-body)',
+                    transition: 'all 0.25s ease',
                   }}>{s}</span>
                 </div>
-                {i < STEPS.length - 1 && (
-                  <div style={{ width: 16, height: 1, background: 'var(--ne-border)' }} />
-                )}
               </div>
             )
           })}
         </div>
 
-        <div style={{ width: 160 }} />
+        <div style={{ width: 120 }} />
       </div>
 
       <div style={{ paddingTop: 56 }}>
@@ -116,9 +132,14 @@ export default function App() {
         {step === 3 && (
           <Step3Calibrate
             city={city} channel={channel} strategy={strategy}
-            tierFilter={tierFilter} routeFilter={routeFilter}
+            tierFilter={tierFilter} setTierFilter={setTierFilter}
+            routeFilter={routeFilter} setRouteFilter={setRouteFilter}
             routeDeviation={routeDeviation} setRouteDeviation={setRouteDeviation}
             persistence={persistence} setPersistence={setPersistence}
+            businessCategory={businessCategory} setBusinessCategory={setBusinessCategory}
+            waysOfReaching={waysOfReaching} setWaysOfReaching={setWaysOfReaching}
+            extraPosPerDay={extraPosPerDay} setExtraPosPerDay={setExtraPosPerDay}
+            numPeople={numPeople} setNumPeople={setNumPeople}
             onBack={() => setStep(2)}
             onNext={() => setStep(4)}
           />
@@ -128,6 +149,8 @@ export default function App() {
             city={city} channel={channel} strategy={strategy}
             tierFilter={tierFilter} routeFilter={routeFilter}
             routeDeviation={routeDeviation} persistence={persistence}
+            waysOfReaching={waysOfReaching}
+            businessCategory={businessCategory}
             excludedStores={excludedStores} setExcludedStores={setExcludedStores}
             onBack={() => setStep(3)}
           />

@@ -25,7 +25,7 @@ const selectStyle = (active) => ({
   width: '100%', padding: '10px 14px',
   background: 'var(--ne-surface-card)',
   border: `1px solid ${active ? 'var(--ne-border-active)' : 'var(--ne-border)'}`,
-  borderRadius: 'var(--ka-radius-lg)', fontSize: 14,
+  borderRadius: 12, fontSize: 14,
   color: 'var(--ne-text)',
   cursor: 'pointer', outline: 'none',
   appearance: 'auto',
@@ -84,6 +84,10 @@ export default function Step1Intent({ city, setCity, channel, setChannel, onNext
   }, [phase])
 
   return (
+    <div style={{
+      minHeight: 'calc(100vh - 56px)',
+      background: 'radial-gradient(ellipse at 30% 0%, #E0E7FF 0%, #F7F9FB 50%, #F7F9FB 100%)',
+    }}>
     <div style={{ maxWidth: 680, margin: '0 auto', padding: '52px 32px 80px', position: 'relative' }}>
 
       {/* Subtle lilac wash behind mission card zone — depth, not decoration */}
@@ -91,7 +95,7 @@ export default function Step1Intent({ city, setCity, channel, setChannel, onNext
         position: 'absolute', top: 120, left: '50%', transform: 'translateX(-50%)',
         width: 500, height: 260, borderRadius: '50%',
         background: 'var(--ne-violet-wash)',
-        opacity: 0.35, filter: 'blur(80px)',
+        opacity: 0.45, filter: 'blur(80px)',
         pointerEvents: 'none',
       }} />
 
@@ -99,7 +103,7 @@ export default function Step1Intent({ city, setCity, channel, setChannel, onNext
       <div style={{ marginBottom: 40, position: 'relative' }}>
         <div style={{
           fontSize: 11, fontWeight: 600, color: 'var(--ne-text-muted)',
-          letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10,
+          letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10,
         }}>
           Step 1 — Intent
         </div>
@@ -124,17 +128,18 @@ export default function Step1Intent({ city, setCity, channel, setChannel, onNext
           Mission
         </div>
         <div style={{
-          background: 'var(--ne-surface-card)',
-          border: '2px solid var(--ne-border-active)',
-          borderRadius: 'var(--ka-radius-lg)', padding: '18px 22px',
+          background: '#fff',
+          borderRadius: 12, padding: '18px 22px',
           display: 'flex', alignItems: 'flex-start', gap: 14,
           boxShadow: 'var(--ne-shadow-rest)',
         }}>
           <div style={{
-            width: 38, height: 38, background: 'var(--ne-surface-base)',
-            borderRadius: 'var(--ka-radius)', display: 'flex', alignItems: 'center',
+            width: 38, height: 38,
+            background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
+            borderRadius: 12, display: 'flex', alignItems: 'center',
             justifyContent: 'center', flexShrink: 0, fontSize: 18,
-            color: 'var(--ne-text-muted)',
+            color: '#fff',
+            boxShadow: '0 4px 12px rgba(99,102,241,0.25)',
           }}>
             ◎
           </div>
@@ -151,8 +156,8 @@ export default function Step1Intent({ city, setCity, channel, setChannel, onNext
             background: 'var(--ne-yellow)',
             color: 'var(--ne-text)',
             fontSize: 10, fontWeight: 700, padding: '4px 10px',
-            borderRadius: 'var(--ka-radius-pill)',
-            letterSpacing: '0.04em', alignSelf: 'flex-start',
+            borderRadius: 100,
+            letterSpacing: '0.08em', alignSelf: 'flex-start',
           }}>
             SELECTED
           </div>
@@ -165,7 +170,7 @@ export default function Step1Intent({ city, setCity, channel, setChannel, onNext
           <label style={{
             display: 'block', fontSize: 11, fontWeight: 600,
             color: 'var(--ne-text-secondary)', marginBottom: 8,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
+            textTransform: 'uppercase', letterSpacing: '0.08em',
           }}>
             City
           </label>
@@ -178,7 +183,7 @@ export default function Step1Intent({ city, setCity, channel, setChannel, onNext
           <label style={{
             display: 'block', fontSize: 11, fontWeight: 600,
             color: 'var(--ne-text-secondary)', marginBottom: 8,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
+            textTransform: 'uppercase', letterSpacing: '0.08em',
           }}>
             Channel
           </label>
@@ -190,60 +195,99 @@ export default function Step1Intent({ city, setCity, channel, setChannel, onNext
       </div>
 
       {/* Universe reveal */}
-      {(phase === 'scanning' || phase === 'revealed') && universe && (
+      {phase === 'scanning' && universe && (
         <div style={{
-          background: 'var(--ne-surface-card)', border: '1px solid var(--ne-border)',
-          borderRadius: 'var(--ka-radius-lg)', padding: '14px 20px', marginBottom: 20,
+          background: '#fff',
+          borderRadius: 12, padding: '16px 24px', marginBottom: 20,
           boxShadow: 'var(--ne-shadow-rest)',
           display: 'flex', alignItems: 'center', gap: 0,
           animation: 'fadeSlideIn 0.3s ease forwards',
-          position: 'relative',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginRight: 20, flexShrink: 0 }}>
-            {phase === 'scanning' ? (
-              <ScanningDot />
-            ) : (
-              <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--ne-text)', flexShrink: 0 }} />
-            )}
+            <ScanningDot />
             <span style={{
               fontSize: 10, fontWeight: 700, color: 'var(--ne-text-muted)',
               letterSpacing: '0.08em', textTransform: 'uppercase',
             }}>
-              {phase === 'scanning' ? 'Scanning…' : 'Scan Complete'}
+              Scanning…
             </span>
           </div>
-
           <div style={{ width: 1, background: 'var(--ne-border)', alignSelf: 'stretch', marginRight: 20 }} />
-
           <div style={{ marginRight: 24 }}>
-            <div style={{ fontSize: 9.5, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 1 }}>
-              Accounts
-            </div>
-            {phase === 'scanning' ? (
-              <Shimmer width={52} height={24} />
-            ) : (
-              <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--ne-text)', lineHeight: 1, letterSpacing: '-0.02em', fontFamily: 'var(--ka-font-heading)', animation: 'fadeSlideIn 0.35s ease forwards' }}>
-                {universe.count.toLocaleString()}
-              </div>
-            )}
+            <div style={{ fontSize: 9.5, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 1 }}>Accounts</div>
+            <Shimmer width={52} height={24} />
+          </div>
+          <div style={{ width: 1, background: 'var(--ne-border)', alignSelf: 'stretch', marginRight: 24 }} />
+          <div>
+            <div style={{ fontSize: 9.5, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 1 }}>Volume Opportunity</div>
+            <Shimmer width={80} height={24} />
+          </div>
+        </div>
+      )}
+
+      {phase === 'revealed' && universe && (
+        <div style={{
+          background: 'linear-gradient(141deg, #6366F1 0%, #818CF8 100%)',
+          borderRadius: 12, padding: '28px 32px', marginBottom: 20,
+          boxShadow: '0 4px 20px rgba(99,102,241,0.3)',
+          animation: 'fadeSlideIn 0.3s ease forwards',
+          position: 'relative', overflow: 'hidden',
+        }}>
+          <div style={{
+            position: 'absolute', top: -10, right: -10, width: 60, height: 60,
+            borderRadius: 30, background: 'rgba(255,255,255,0.08)',
+          }} />
+
+          {/* Title */}
+          <div style={{
+            fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.55)',
+            letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 20,
+          }}>
+            Territory Scan Complete
           </div>
 
-          <div style={{ width: 1, background: 'var(--ne-border)', alignSelf: 'stretch', marginRight: 24 }} />
-
-          <div>
-            <div style={{ fontSize: 9.5, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 1 }}>
-              Volume Opportunity
-            </div>
-            {phase === 'scanning' ? (
-              <Shimmer width={80} height={24} />
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, animation: 'fadeSlideIn 0.35s ease forwards' }}>
-                <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--ne-text)', lineHeight: 1, letterSpacing: '-0.02em', fontFamily: 'var(--ka-font-heading)' }}>
-                  +{universe.potential.toLocaleString()}
-                </div>
-                <span style={{ fontSize: 11, color: 'var(--ne-text-muted)', fontWeight: 500 }}>UC/mo</span>
+          {/* Two KPI columns */}
+          <div style={{ display: 'flex', gap: 40, marginBottom: 20 }}>
+            <div>
+              <div style={{
+                fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.55)',
+                letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6,
+              }}>
+                White-Space Accounts Found
               </div>
-            )}
+              <div style={{
+                fontSize: 42, fontWeight: 800, color: '#fff', lineHeight: 1,
+                letterSpacing: '-0.03em', fontFamily: 'var(--ka-font-heading)',
+                animation: 'fadeSlideIn 0.35s ease forwards',
+              }}>
+                {universe.count.toLocaleString()}
+              </div>
+            </div>
+            <div>
+              <div style={{
+                fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.55)',
+                letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6,
+              }}>
+                Volume Opportunity
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, animation: 'fadeSlideIn 0.35s ease forwards' }}>
+                <span style={{
+                  fontSize: 42, fontWeight: 800, color: '#fff', lineHeight: 1,
+                  letterSpacing: '-0.03em', fontFamily: 'var(--ka-font-heading)',
+                }}>
+                  +{universe.potential.toLocaleString()}
+                </span>
+                <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>UC / month</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Footnote */}
+          <div style={{
+            borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 14,
+            fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5,
+          }}>
+            Your active accounts are excluded. Opportunity benchmarked against served accounts in the same zones.
           </div>
         </div>
       )}
@@ -255,10 +299,10 @@ export default function Step1Intent({ city, setCity, channel, setChannel, onNext
             onClick={handleScan}
             disabled={!canScan}
             style={{
-              background: canScan ? 'var(--ne-yellow)' : 'var(--ne-surface-base)',
-              color: canScan ? 'var(--ne-text)' : 'var(--ne-text-muted)',
+              background: canScan ? 'var(--ne-text)' : 'var(--ne-surface-base)',
+              color: canScan ? '#fff' : 'var(--ne-text-muted)',
               fontWeight: 600, padding: '11px 32px',
-              borderRadius: 'var(--ka-radius-pill)', border: 'none',
+              borderRadius: 100, border: 'none',
               cursor: canScan ? 'pointer' : 'not-allowed',
               fontSize: 14, transition: 'background var(--ne-ease-color)',
             }}
@@ -271,7 +315,7 @@ export default function Step1Intent({ city, setCity, channel, setChannel, onNext
             background: 'var(--ne-surface-base)',
             color: 'var(--ne-text-muted)',
             fontWeight: 600, padding: '11px 32px',
-            borderRadius: 'var(--ka-radius-pill)', border: 'none',
+            borderRadius: 100, border: 'none',
             fontSize: 14, cursor: 'not-allowed',
           }}>
             Scanning…
@@ -281,10 +325,10 @@ export default function Step1Intent({ city, setCity, channel, setChannel, onNext
           <button
             onClick={onNext}
             style={{
-              background: 'var(--ne-yellow)',
-              color: 'var(--ne-text)',
+              background: 'var(--ne-text)',
+              color: '#fff',
               fontWeight: 600, padding: '11px 32px',
-              borderRadius: 'var(--ka-radius-pill)', border: 'none',
+              borderRadius: 100, border: 'none',
               cursor: 'pointer', fontSize: 14,
               animation: 'fadeSlideIn 0.3s ease forwards',
               transition: 'background var(--ne-ease-color)',
@@ -295,6 +339,7 @@ export default function Step1Intent({ city, setCity, channel, setChannel, onNext
         )}
       </div>
 
+    </div>
     </div>
   )
 }

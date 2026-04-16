@@ -7,7 +7,16 @@ import ContextStrip from './ContextStrip.jsx'
 export const TIER_META = {
   gold:   { label: 'Gold',   color: '#141417', bg: '#F2F2F2', border: '#d4d5d6', minPotential: 90 },
   silver: { label: 'Silver', color: '#141417', bg: '#F2F2F2', border: '#d4d5d6', minPotential: 30 },
-  bronze: { label: 'Bronze', color: '#141417', bg: '#F2F2F2', border: '#d4d5d6', minPotential: 0  },
+  bronze: { label: 'Bronze', color: '#141417', bg: '#F2F2F2', border: '#d4d5d6', minPotential: 10 },
+  iron:   { label: 'Iron',   color: '#141417', bg: '#F2F2F2', border: '#d4d5d6', minPotential: 0  },
+}
+
+export const CATEGORY_META = {
+  abarrotes:   { label: 'Abarrotes' },
+  miscelánea:  { label: 'Miscelánea' },
+  tienda:      { label: 'Tienda' },
+  mini_mart:   { label: 'Mini Mart' },
+  expendio:    { label: 'Expendio' },
 }
 
 export const ROUTE_META = {
@@ -17,30 +26,30 @@ export const ROUTE_META = {
 }
 
 export const DENSITY_WS = [
-  { id: 'd1',  x: 118, y: 82,  name: 'Abarrotes Cruz',      potential: 31,  tier: 'silver', route: 'Route 4', distance: 85  },
-  { id: 'd2',  x: 178, y: 128, name: 'Mini Mart Sol',        potential: 28,  tier: 'bronze', route: 'Route 4', distance: 120 },
-  { id: 'd3',  x: 238, y: 80,  name: 'Tienda Rivera',        potential: 35,  tier: 'silver', route: 'Route 4', distance: 95  },
-  { id: 'd4',  x: 345, y: 128, name: 'Miscelánea Norte',     potential: 29,  tier: 'bronze', route: 'Route 4', distance: 140 },
-  { id: 'd5',  x: 428, y: 82,  name: 'Abarrotes Plaza',      potential: 33,  tier: 'silver', route: 'Route 4', distance: 75  },
-  { id: 'd6',  x: 470, y: 128, name: 'Mini Stop',            potential: 27,  tier: 'bronze', route: 'Route 4', distance: 160 },
-  { id: 'd7',  x: 116, y: 315, name: 'Tienda del Barrio',    potential: 30,  tier: 'silver', route: 'Route 2', distance: 110 },
-  { id: 'd8',  x: 162, y: 268, name: 'Super Rápido',         potential: 26,  tier: 'bronze', route: 'Route 2', distance: 130 },
-  { id: 'd9',  x: 268, y: 198, name: 'Abarrotes Luz',        potential: 32,  tier: 'silver', route: 'Route 2', distance: 90  },
-  { id: 'd10', x: 522, y: 212, name: 'Kiosko Central',       potential: 24,  tier: 'bronze', route: 'Route 1', distance: 180 },
-  { id: 'd11', x: 158, y: 90,  name: 'Súper González',       potential: 97,  tier: 'gold',   route: 'Route 4', distance: 80  },
-  { id: 'd12', x: 308, y: 90,  name: 'Abarrotes Premium',    potential: 104, tier: 'gold',   route: 'Route 4', distance: 65  },
-  { id: 'd13', x: 222, y: 292, name: 'Mega Barrio',          potential: 93,  tier: 'gold',   route: 'Route 2', distance: 120 },
+  { id: 'd1',  x: 118, y: 82,  name: 'Abarrotes Cruz',      potential: 31,  tier: 'silver', route: 'Route 4', distance: 85,  category: 'abarrotes',  hasPhone: true,  phone: '81 1234 5678', area: 'Col. Mitras' },
+  { id: 'd2',  x: 178, y: 128, name: 'Mini Mart Sol',        potential: 28,  tier: 'bronze', route: 'Route 4', distance: 120, category: 'mini_mart',  hasPhone: true,  phone: '81 2345 6789', area: 'Col. Mitras' },
+  { id: 'd3',  x: 238, y: 80,  name: 'Tienda Rivera',        potential: 35,  tier: 'silver', route: 'Route 4', distance: 95,  category: 'tienda',     hasPhone: false, phone: null,           area: 'Col. Mitras' },
+  { id: 'd4',  x: 345, y: 128, name: 'Miscelánea Norte',     potential: 29,  tier: 'bronze', route: 'Route 4', distance: 140, category: 'miscelánea', hasPhone: true,  phone: '81 3456 7890', area: 'Col. Obispado' },
+  { id: 'd5',  x: 428, y: 82,  name: 'Abarrotes Plaza',      potential: 33,  tier: 'silver', route: 'Route 4', distance: 75,  category: 'abarrotes',  hasPhone: true,  phone: '81 4567 8901', area: 'Col. Obispado' },
+  { id: 'd6',  x: 470, y: 128, name: 'Mini Stop',            potential: 8,   tier: 'iron',   route: 'Route 4', distance: 160, category: 'mini_mart',  hasPhone: false, phone: null,           area: 'Col. Obispado' },
+  { id: 'd7',  x: 116, y: 315, name: 'Tienda del Barrio',    potential: 30,  tier: 'silver', route: 'Route 2', distance: 110, category: 'tienda',     hasPhone: true,  phone: '81 5678 9012', area: 'Col. Del Valle' },
+  { id: 'd8',  x: 162, y: 268, name: 'Super Rápido',         potential: 6,   tier: 'iron',   route: 'Route 2', distance: 130, category: 'abarrotes',  hasPhone: false, phone: null,           area: 'Col. Del Valle' },
+  { id: 'd9',  x: 268, y: 198, name: 'Abarrotes Luz',        potential: 32,  tier: 'silver', route: 'Route 2', distance: 90,  category: 'abarrotes',  hasPhone: true,  phone: '81 6789 0123', area: 'Col. Centro' },
+  { id: 'd10', x: 522, y: 212, name: 'Kiosko Central',       potential: 24,  tier: 'bronze', route: 'Route 1', distance: 180, category: 'expendio',   hasPhone: false, phone: null,           area: 'Col. Centro' },
+  { id: 'd11', x: 158, y: 90,  name: 'Súper González',       potential: 97,  tier: 'gold',   route: 'Route 4', distance: 80,  category: 'abarrotes',  hasPhone: true,  phone: '81 7890 1234', area: 'Col. Mitras' },
+  { id: 'd12', x: 308, y: 90,  name: 'Abarrotes Premium',    potential: 104, tier: 'gold',   route: 'Route 4', distance: 65,  category: 'abarrotes',  hasPhone: true,  phone: '81 8901 2345', area: 'Col. Obispado' },
+  { id: 'd13', x: 222, y: 292, name: 'Mega Barrio',          potential: 93,  tier: 'gold',   route: 'Route 2', distance: 120, category: 'tienda',     hasPhone: true,  phone: '81 9012 3456', area: 'Col. Del Valle' },
 ]
 
 export const CLUSTER_WS = [
-  { id: 'c1', x: 415, y: 258, name: 'MegaMart Oriente',    potential: 112, tier: 'gold',   route: 'Route 4', distance: 650  },
-  { id: 'c2', x: 458, y: 290, name: 'Supercito Las Vegas', potential: 98,  tier: 'gold',   route: 'Route 4', distance: 720  },
-  { id: 'c3', x: 395, y: 318, name: 'Tienda Mercado',      potential: 87,  tier: 'silver', route: 'Route 2', distance: 580  },
-  { id: 'c4', x: 475, y: 335, name: 'Abarrotes Fuerte',    potential: 103, tier: 'gold',   route: 'Route 4', distance: 850  },
-  { id: 'c5', x: 438, y: 358, name: 'Mini Central',        potential: 79,  tier: 'silver', route: 'Route 2', distance: 920  },
-  { id: 'c6', x: 505, y: 305, name: 'Expendio Popular',    potential: 94,  tier: 'gold',   route: 'Route 4', distance: 780  },
-  { id: 'c7', x: 368, y: 350, name: 'Abarrotes Colonia',   potential: 76,  tier: 'silver', route: 'Route 2', distance: 1100 },
-  { id: 'c8', x: 508, y: 365, name: 'Super Vecino',        potential: 88,  tier: 'silver', route: 'Route 2', distance: 1400 },
+  { id: 'c1', x: 415, y: 258, name: 'MegaMart Oriente',    potential: 112, tier: 'gold',   route: 'Route 4', distance: 650,  category: 'mini_mart',  hasPhone: true,  phone: '81 1111 2222', area: 'Col. Linda Vista' },
+  { id: 'c2', x: 458, y: 290, name: 'Supercito Las Vegas', potential: 98,  tier: 'gold',   route: 'Route 4', distance: 720,  category: 'abarrotes',  hasPhone: true,  phone: '81 2222 3333', area: 'Col. Linda Vista' },
+  { id: 'c3', x: 395, y: 318, name: 'Tienda Mercado',      potential: 87,  tier: 'silver', route: 'Route 2', distance: 580,  category: 'tienda',     hasPhone: false, phone: null,           area: 'Col. Contry' },
+  { id: 'c4', x: 475, y: 335, name: 'Abarrotes Fuerte',    potential: 103, tier: 'gold',   route: 'Route 4', distance: 850,  category: 'abarrotes',  hasPhone: true,  phone: '81 3333 4444', area: 'Col. Contry' },
+  { id: 'c5', x: 438, y: 358, name: 'Mini Central',        potential: 79,  tier: 'silver', route: 'Route 2', distance: 920,  category: 'mini_mart',  hasPhone: true,  phone: '81 4444 5555', area: 'Col. Linda Vista' },
+  { id: 'c6', x: 505, y: 305, name: 'Expendio Popular',    potential: 94,  tier: 'gold',   route: 'Route 4', distance: 780,  category: 'expendio',   hasPhone: false, phone: null,           area: 'Col. Contry' },
+  { id: 'c7', x: 368, y: 350, name: 'Abarrotes Colonia',   potential: 76,  tier: 'silver', route: 'Route 2', distance: 1100, category: 'abarrotes',  hasPhone: false, phone: null,           area: 'Col. Cumbres' },
+  { id: 'c8', x: 508, y: 365, name: 'Super Vecino',        potential: 88,  tier: 'silver', route: 'Route 2', distance: 1400, category: 'abarrotes',  hasPhone: true,  phone: '81 5555 6666', area: 'Col. Cumbres' },
 ]
 
 export const OTHER_WS = [
@@ -126,6 +135,9 @@ const GEO_CLUSTER_WS = {
 }
 
 // ── Strategy config ────────────────────────────────────────────────────────────
+const EXECUTION_LABELS = { 'Own Team': 'Own Team', 'External Team': 'External Team' }
+const WAY_LABELS = { phone: 'Phone', 'in-person': 'In-person' }
+
 const STRATEGIES = {
   density: {
     label: 'Density Fill',
@@ -133,6 +145,7 @@ const STRATEGIES = {
     description: 'Accounts within 200–500m of existing routes. Rep covers these without changing the truck stop schedule. Lower average volume per account, lower cost to serve.',
     stores: '287', ucmo: '+2,300 UC/mo',
     color: '#141417', bg: '#F2F2F2', border: '#d4d5d6',
+    executionMode: 'Own Team',
   },
   clusters: {
     label: 'High-Potential Clusters',
@@ -140,6 +153,8 @@ const STRATEGIES = {
     description: 'Accounts with >35 UC/wk that sit outside route proximity. Requires a planned detour or partial route restructure. Higher volume per account, higher cost to serve.',
     stores: '60', ucmo: '+1,900 UC/mo',
     color: '#141417', bg: '#F2F2F2', border: '#d4d5d6',
+    executionMode: 'External Team',
+    defaultWayOfReaching: ['phone', 'in-person'],
   },
 }
 
@@ -315,66 +330,95 @@ function StrategyCard({ id, data, selected, onSelect }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: active ? data.bg : 'var(--ne-surface-card)',
-        border: `2px solid ${active ? data.color : 'var(--ne-border)'}`,
-        borderRadius: '0.875rem', padding: '14px 16px',
-        cursor: 'pointer', transition: 'all var(--ne-ease-shadow)',
+        background: selected
+          ? 'linear-gradient(141deg, #6366F1 0%, #818CF8 100%)'
+          : hovered ? '#F0EEFF' : '#fff',
+        border: `2px solid ${selected ? '#6366F1' : hovered ? '#A5B4FC' : 'var(--ne-border)'}`,
+        borderRadius: 12, padding: '14px 16px',
+        cursor: 'pointer', transition: 'all 0.2s ease',
         position: 'relative', overflow: 'hidden',
         flexShrink: 0,
-        boxShadow: active ? 'var(--ne-shadow-lifted)' : 'var(--ne-shadow-rest)',
+        boxShadow: selected
+          ? '0 4px 20px rgba(99,102,241,0.3)'
+          : hovered ? '0 4px 16px rgba(99,102,241,0.15)' : 'var(--ne-shadow-rest)',
       }}
     >
       {selected && (
-        <div style={{
-          position: 'absolute', top: 10, right: 10,
-          width: 20, height: 20, borderRadius: '50%',
-          background: '#141417',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <polyline points="2,5 4,7 8,3" stroke="#FFFFFF" strokeWidth="1.6"
-              strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
+        <>
+          <div style={{
+            position: 'absolute', top: -10, right: -10, width: 48, height: 48,
+            borderRadius: 24, background: 'rgba(255,255,255,0.08)',
+          }} />
+          <div style={{
+            position: 'absolute', top: 10, right: 10,
+            width: 20, height: 20, borderRadius: '50%',
+            background: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <polyline points="2,5 4,7 8,3" stroke="#6366F1" strokeWidth="1.6"
+                strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+        </>
       )}
 
       <div style={{ marginBottom: 6 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: '#141417',
-          letterSpacing: '-0.01em', lineHeight: 1.2 }}>
-          {data.label}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+          <div style={{ fontSize: 15, fontWeight: 700,
+            color: selected ? '#fff' : '#141417',
+            letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+            {data.label}
+          </div>
+          <span style={{
+            fontSize: 9, fontWeight: 700, letterSpacing: '0.06em',
+            padding: '3px 8px', borderRadius: 100,
+            background: selected ? 'rgba(255,255,255,0.18)' : 'rgba(99,102,241,0.1)',
+            color: selected ? 'rgba(255,255,255,0.85)' : '#6366F1',
+            whiteSpace: 'nowrap',
+          }}>
+            {data.executionMode}
+          </span>
         </div>
-        <div style={{ fontSize: 10, fontWeight: 600, color: '#999ea6', letterSpacing: '0.06em',
-          textTransform: 'uppercase', marginTop: 2 }}>
+        <div style={{ fontSize: 10, fontWeight: 600,
+          color: selected ? 'rgba(255,255,255,0.55)' : '#999ea6',
+          letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 2 }}>
           {data.tagline}
         </div>
       </div>
 
-      <p style={{ fontSize: 11.5, color: 'var(--ne-text-secondary)', lineHeight: 1.55, margin: '0 0 12px' }}>
+      <p style={{ fontSize: 11.5,
+        color: selected ? 'rgba(255,255,255,0.75)' : 'var(--ne-text-secondary)',
+        lineHeight: 1.55, margin: '0 0 12px' }}>
         {data.description}
       </p>
 
       <div style={{
         display: 'flex', gap: 0,
         paddingTop: 10,
-        borderTop: '1px solid var(--ne-border)',
+        borderTop: `1px solid ${selected ? 'rgba(255,255,255,0.15)' : 'var(--ne-border)'}`,
       }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 8.5, fontWeight: 600, color: 'var(--ne-text-muted)',
-            textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 3 }}>
+          <div style={{ fontSize: 8.5, fontWeight: 600,
+            color: selected ? 'rgba(255,255,255,0.55)' : 'var(--ne-text-muted)',
+            textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>
             Accounts
           </div>
-          <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--ne-text)',
+          <div style={{ fontSize: 22, fontWeight: 900,
+            color: selected ? '#fff' : 'var(--ne-text)',
             letterSpacing: '-0.03em', lineHeight: 1 }}>
             {data.stores}
           </div>
         </div>
-        <div style={{ width: 1, background: 'var(--ne-border)', margin: '0 14px' }} />
+        <div style={{ width: 1, background: selected ? 'rgba(255,255,255,0.15)' : 'var(--ne-border)', margin: '0 14px' }} />
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 8.5, fontWeight: 600, color: 'var(--ne-text-muted)',
-            textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 3 }}>
+          <div style={{ fontSize: 8.5, fontWeight: 600,
+            color: selected ? 'rgba(255,255,255,0.55)' : 'var(--ne-text-muted)',
+            textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>
             Net Volume
           </div>
-          <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--ne-violet)',
+          <div style={{ fontSize: 18, fontWeight: 900,
+            color: selected ? '#E5FF01' : 'var(--ne-violet)',
             letterSpacing: '-0.02em', lineHeight: 1, whiteSpace: 'nowrap' }}>
             {data.ucmo}
           </div>
@@ -389,17 +433,18 @@ function StrategyCard({ id, data, selected, onSelect }) {
 function AIRecommendation({ strategy }) {
   return (
     <div style={{
-      background: 'var(--ne-surface-base)',
-      border: '1px solid var(--ne-border)',
+      background: '#fff',
       borderLeft: '3px solid var(--ne-violet)',
-      borderRadius: '0.75rem', padding: '12px 14px',
+      borderRadius: 12, padding: '12px 14px',
       flexShrink: 0,
+      boxShadow: 'var(--ne-shadow-rest)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
         <div style={{
-          width: 22, height: 22, borderRadius: '0.4rem', flexShrink: 0,
-          background: '#141417',
+          width: 22, height: 22, borderRadius: 8, flexShrink: 0,
+          background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 2px 6px rgba(99,102,241,0.25)',
         }}>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <circle cx="6" cy="6" r="4.5" stroke="#FFFFFF" strokeWidth="1.2" />
@@ -445,7 +490,7 @@ function MapLegend({ strategy }) {
     <div style={{
       display: 'flex', alignItems: 'center', gap: 14,
       background: 'rgba(28,31,46,0.85)', backdropFilter: 'blur(4px)',
-      border: '1px solid rgba(255,255,255,0.12)', borderRadius: '0.5rem',
+      border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8,
       padding: '6px 12px',
     }}>
       {items.map((item, i) => (
@@ -465,6 +510,8 @@ function MapLegend({ strategy }) {
 
 // ── Step 2 ─────────────────────────────────────────────────────────────────────
 
+export { EXECUTION_LABELS, WAY_LABELS, STRATEGIES as STRATEGY_CONFIG }
+
 export default function Step2Discovery({
   city, channel, strategy, setStrategy,
   setTierFilter, setRouteFilter,
@@ -483,7 +530,7 @@ export default function Step2Discovery({
     <div style={{
       height: 'calc(100vh - 56px)',
       display: 'flex', flexDirection: 'column',
-      overflow: 'hidden', background: 'var(--ne-surface-base)',
+      overflow: 'hidden', background: 'radial-gradient(ellipse at 0% 0%, #E0E7FF 0%, #F7F9FB 50%, #F7F9FB 100%)',
     }}>
 
       {/* ── Compact header ── */}
@@ -495,7 +542,7 @@ export default function Step2Discovery({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
           <div>
             <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--ne-text-muted)',
-              letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2 }}>
+              letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2 }}>
               Step 2 — Discovery
             </div>
             <h1 style={{ fontSize: 19, fontWeight: 800, color: 'var(--ne-text)',
@@ -506,16 +553,16 @@ export default function Step2Discovery({
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
             <button onClick={onBack} style={{
               background: 'transparent', color: 'var(--ne-text-secondary)',
-              border: '1px solid var(--ne-border)', borderRadius: 'var(--ka-radius)',
+              border: '1px solid var(--ne-border)', borderRadius: 100,
               padding: '6px 13px', fontSize: 12.5, cursor: 'pointer',
             }}>
               ← Back
             </button>
             <button onClick={onNext} disabled={!strategy} style={{
-              background: strategy ? 'var(--ne-yellow)' : 'var(--ne-surface-base)',
-              color: strategy ? 'var(--ne-text)' : 'var(--ne-text-muted)',
+              background: strategy ? 'var(--ne-text)' : 'var(--ne-surface-base)',
+              color: strategy ? '#fff' : 'var(--ne-text-muted)',
               fontWeight: 700, padding: '6px 16px',
-              borderRadius: 'var(--ka-radius-pill)', border: 'none',
+              borderRadius: 100, border: 'none',
               fontSize: 12.5, cursor: strategy ? 'pointer' : 'not-allowed',
               transition: 'all 0.15s',
             }}>
@@ -524,7 +571,9 @@ export default function Step2Discovery({
           </div>
         </div>
         <div style={{ paddingBottom: 8 }}>
-          <ContextStrip city={city} channel={channel} strategy={strategy} />
+          <ContextStrip city={city} channel={channel} strategy={strategy}
+            executionMode={strategy ? STRATEGIES[strategy]?.executionMode : null}
+          />
         </div>
       </div>
 
@@ -557,9 +606,8 @@ export default function Step2Discovery({
         }}>
           <div style={{
             flex: 1, position: 'relative', minHeight: 0,
-            borderRadius: '0.875rem',
+            borderRadius: 12,
             overflow: 'hidden',
-            border: '1px solid rgba(255,255,255,0.08)',
             boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
           }}>
             <MapboxDiscoveryMap strategy={strategy} compMode={compMode} />
@@ -570,7 +618,7 @@ export default function Step2Discovery({
               display: 'flex', alignItems: 'center', gap: 5,
               background: 'rgba(255,255,255,0.94)',
               border: '1px solid var(--ne-border)',
-              borderRadius: '0.4rem', padding: '5px 10px',
+              borderRadius: 8, padding: '5px 10px',
               boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
               zIndex: 10,
             }}>
@@ -591,7 +639,7 @@ export default function Step2Discovery({
                   display: 'flex', alignItems: 'center', gap: 5,
                   background: compMode ? '#141417' : 'rgba(255,255,255,0.94)',
                   border: `1px solid ${compMode ? '#141417' : 'var(--ne-border)'}`,
-                  borderRadius: '0.4rem', padding: '5px 10px',
+                  borderRadius: 8, padding: '5px 10px',
                   cursor: 'pointer', fontSize: 10.5, fontWeight: 600,
                   color: compMode ? '#FFFFFF' : 'var(--ne-text)',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
@@ -621,7 +669,7 @@ export default function Step2Discovery({
                 <div style={{
                   background: 'rgba(28,31,46,0.85)',
                   border: '1px solid rgba(255,255,255,0.12)',
-                  borderRadius: '0.75rem', padding: '14px 22px',
+                  borderRadius: 12, padding: '14px 22px',
                   textAlign: 'center',
                 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF', marginBottom: 4 }}>
