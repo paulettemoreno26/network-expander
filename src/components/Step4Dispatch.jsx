@@ -534,44 +534,44 @@ export default function Step4Dispatch({
 
   return (
     <div style={{
-      maxWidth: 900, margin: '0 auto',
       background: 'radial-gradient(ellipse at 0% 0%, #E0E7FF 0%, #F7F9FB 40%, #F7F9FB 100%)',
       minHeight: 'calc(100vh - 56px)',
     }}>
 
-      {/* Sticky header */}
+      {/* Sticky header — matches Stage 3 context bar */}
       <div style={{
         position: 'sticky', top: 56, zIndex: 40,
         background: 'rgba(247,249,251,0.92)', backdropFilter: 'blur(8px)',
-        paddingBottom: 12, marginBottom: 4,
+        paddingBottom: 10,
         borderBottom: '1px solid var(--ne-border)',
       }}>
-        <div style={{ padding: '16px 32px 0', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--ne-text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
-              Step 4 — Activate
-            </div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--ne-text)', letterSpacing: '-0.02em', margin: 0, fontFamily: 'var(--ka-font-heading)' }}>
-              Review & Activate
-            </h1>
-          </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', paddingTop: 4, flexShrink: 0 }}>
+        <div style={{ padding: '8px 24px 4px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+          <ContextStrip city={city} channel={channel} strategy={strategy} executionMode={executionMode} />
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
             <button onClick={onBack} style={{
-              background: 'transparent', color: 'var(--ne-text-secondary)',
-              border: '1px solid var(--ne-border)', borderRadius: 12,
-              padding: '8px 14px', fontSize: 13, cursor: 'pointer',
-              fontFamily: 'var(--ka-font-body)',
-            }}>
-              ← Back
+              background: '#fff', color: 'var(--ne-text-secondary)',
+              border: '1px solid var(--ne-border)', borderRadius: 'var(--ne-radius-pill)',
+              padding: '8px 17px', fontSize: 12, fontWeight: 500, cursor: 'pointer',
+            }}>← Back</button>
+            <button
+              onClick={() => { if (isExternal) downloadBrief(); setDispatched(true) }}
+              disabled={!canActivate}
+              style={{
+                background: canActivate ? 'var(--ne-text)' : 'var(--ne-surface-base)',
+                color: canActivate ? '#fff' : 'var(--ne-text-muted)',
+                fontWeight: 700, padding: '8px 20px', borderRadius: 'var(--ne-radius-pill)',
+                border: 'none', cursor: canActivate ? 'pointer' : 'not-allowed',
+                fontSize: 12, fontFamily: 'var(--ka-font-body)',
+                transition: 'background var(--ne-ease-color)',
+              }}
+            >
+              {isExternal ? 'Activate & Export Brief →' : `Activate ${active.length} Accounts →`}
             </button>
           </div>
         </div>
-        <div style={{ padding: '8px 32px 0' }}>
-          <ContextStrip city={city} channel={channel} strategy={strategy} executionMode={executionMode} />
-        </div>
       </div>
 
-      <div style={{ padding: '0 24px 48px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ padding: '16px 24px 48px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* ── Mission value bar ── */}
         <div style={{
@@ -858,27 +858,16 @@ export default function Step4Dispatch({
           </div>
         </div>
 
-        {/* ── Activate Plan CTA ── */}
+        {/* ── Agency selection hint ── */}
         {isExternal && !selectedAgency && (
-          <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--ne-text-muted)', marginBottom: -8 }}>
-            Select a partner agency above to enable activation
+          <div style={{
+            textAlign: 'center', fontSize: 12, color: 'var(--ne-text-muted)',
+            padding: '6px 0', background: 'rgba(245,158,11,0.06)',
+            borderRadius: 8, border: '1px solid rgba(245,158,11,0.15)',
+          }}>
+            Select a partner agency in "Assigned To" to enable activation
           </div>
         )}
-        <button
-          onClick={() => { if (isExternal) downloadBrief(); setDispatched(true) }}
-          disabled={!canActivate}
-          style={{
-            width: '100%',
-            background: canActivate ? 'var(--ne-text)' : 'var(--ne-surface-base)',
-            color: canActivate ? '#fff' : 'var(--ne-text-muted)',
-            fontWeight: 700, padding: '14px', borderRadius: 100,
-            border: 'none', cursor: canActivate ? 'pointer' : 'not-allowed',
-            fontSize: 14, fontFamily: 'var(--ka-font-body)',
-            transition: 'background var(--ne-ease-color)',
-          }}
-        >
-          {isExternal ? 'Activate & Export Brief' : 'Activate Plan'}
-        </button>
 
         {/* ── Opening Argument — secondary ── */}
         <div style={{ ...card, borderLeft: '3px solid #6366F1', padding: '16px 20px' }}>
