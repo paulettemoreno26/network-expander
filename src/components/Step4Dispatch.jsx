@@ -10,6 +10,13 @@ const STRATEGY_META = {
 }
 
 const CHANNEL_LABELS = { traditional: 'Traditional', modern: 'Modern' }
+const CITY_LABELS = { monterrey: 'Monterrey', cdmx: 'CDMX', guadalajara: 'Guadalajara', puebla: 'Puebla', tijuana: 'Tijuana' }
+
+const AGENCIES = [
+  { id: 'agency-a', name: 'Distribuidora Norte', capacity: 10, used: 5, contact: 'Regional Manager', costPerDrop: 45 },
+  { id: 'agency-b', name: 'LogiServ MTY',        capacity: 8,  used: 6, contact: 'Regional Manager', costPerDrop: 52 },
+  { id: 'agency-c', name: 'Grupo Comercial Rex',  capacity: 15, used: 3, contact: 'Regional Manager', costPerDrop: 38 },
+]
 
 function getMissionMinutes(stores) {
   const travel = stores.reduce((sum, s) => sum + s.distance, 0) / 1000 * 6
@@ -83,6 +90,7 @@ export default function Step4Dispatch({
 }) {
   const [dispatched, setDispatched] = useState(false)
   const [phasesOpen, setPhasesOpen] = useState(false)
+  const [selectedAgency, setSelectedAgency] = useState(null)
 
   const meta        = STRATEGY_META[strategy] || STRATEGY_META.density
   const pool        = STRATEGY_POOLS[strategy] || []
@@ -91,6 +99,7 @@ export default function Step4Dispatch({
   const cycleWeeks  = persistence || 3
   const PHASES      = buildPhases(cycleWeeks)
   const executionMode = STRATEGY_CONFIG[strategy]?.executionMode || 'Own Team'
+  const isExternal = executionMode === 'External Team'
 
   const active         = stores.filter(s => !excludedStores.includes(s.id))
   const totalPotential = active.reduce((s, s2) => s + s2.potential, 0)
@@ -103,6 +112,12 @@ export default function Step4Dispatch({
     .sort((a, b) => a.route.localeCompare(b.route))
 
   const opening = getOpeningArgument(strategy, channel, avgPotential)
+
+  // External team computed values
+  const agency = isExternal ? AGENCIES.find(a => a.id === selectedAgency) : null
+  const costPerDrop = agency?.costPerDrop || 0
+  const totalServiceFee = costPerDrop * active.length
+  const canActivate = active.length > 0 && (!isExternal || selectedAgency !== null)
 
   // Dynamic third column: phone-first for clusters with phone, otherwise location
   const showPhone = strategy === 'clusters' && waysOfReaching?.includes('phone')
@@ -165,9 +180,11 @@ export default function Step4Dispatch({
           <div style={{ fontSize: 13, color: 'var(--ne-text)', fontWeight: 500, textDecoration: excluded ? 'line-through' : 'none' }}>
             {store.name}
           </div>
-          <div style={{ fontSize: 10.5, color: 'var(--ne-text-muted)', marginTop: 1 }}>
-            {store.route} · {ROUTE_META[store.route]?.supervisor || ''}
-          </div>
+          {!isExternal && (
+            <div style={{ fontSize: 10.5, color: 'var(--ne-text-muted)', marginTop: 1 }}>
+              {store.route} · {ROUTE_META[store.route]?.supervisor || ''}
+            </div>
+          )}
         </div>
         <div style={{ fontSize: 12, color: excluded ? 'var(--ne-text-muted)' : 'var(--ne-text-secondary)' }}>
           {usePhone && store.phone ? (
@@ -183,8 +200,219 @@ export default function Step4Dispatch({
     )
   }
 
+  function buildBrief() {
+    const ag = AGENCIES.find(a => a.id === selectedAgency)
+    const cityLabel = CITY_LABELS[city] || city || ''
+    const channelLabel = CHANNEL_LABELS[channel] || channel || ''
+    const accountLines = active.map((s, i) =>
+      `  ${i + 1}. ${s.name} | ${s.route} | +${s.potential} UC/wk${s.hasPhone && s.phone ? ` | ${s.phone}` : ' | no phone on file'}`
+    )
+    const phaseLines = [1, 2, 3].flatMap(n => [
+      `  Phase ${n} — ${PHASES[n].label} (${PHASES[n].timeline})`,
+      `  ${PHASES[n].directive}`,
+      '',
+    ])
+    return [
+      'NETWORK EXPANDER — FIELD HANDOVER BRIEF',
+      `Date: ${new Date().toLocaleDateString('en-MX')}`,
+      '',
+      '── MISSION OVERVIEW ──────────────────────────────────',
+      `  City:      ${cityLabel}`,
+      `  Channel:   ${channelLabel}`,
+      `  Strategy:  ${meta.label}`,
+      `  Execution: External Team`,
+      '',
+      '── PARTNER AGENCY ────────────────────────────────────',
+      `  Name:            ${ag?.name || '—'}`,
+      `  Cost per Drop:   $${ag?.costPerDrop || 0}`,
+      `  Contracted Slots:${ag?.capacity || 0}`,
+      `  Est. Service Fee:$${totalServiceFee} per cycle`,
+      '',
+      `── TARGET ACCOUNTS (${active.length}) ─────────────────────────`,
+      ...accountLines,
+      '',
+      '── OPENING ARGUMENT ──────────────────────────────────',
+      `  ${opening}`,
+      '',
+      '── FIELD INSTRUCTIONS BY PHASE ──────────────────────',
+      ...phaseLines,
+    ].join('\n')
+  }
+
+  function downloadBrief() {
+    const text = buildBrief()
+    const blob = new Blob([text], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `handover-brief-${city || 'plan'}-${new Date().toISOString().slice(0, 10)}.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   // ── Post-activation ─────────────────────────────────────────────────────────
   if (dispatched) {
+    const activatedAgency = isExternal ? AGENCIES.find(a => a.id === selectedAgency) : null
+
+    if (isExternal) {
+      return (
+        <div style={{
+          maxWidth: 720, margin: '0 auto', padding: '56px 32px 80px',
+          background: 'radial-gradient(ellipse at 20% 0%, #E0E7FF 0%, #F7F9FB 50%, #F7F9FB 100%)',
+          minHeight: 'calc(100vh - 56px)',
+        }}>
+          {/* Hero */}
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <div style={{
+              width: 64, height: 64, margin: '0 auto 20px',
+              background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
+              borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 6px 24px rgba(99,102,241,0.35)',
+            }}>
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <polyline points="6,14 11,19 22,8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <h1 style={{ fontSize: 26, fontWeight: 800, color: 'var(--ne-text)', letterSpacing: '-0.02em', margin: '0 0 8px', fontFamily: 'var(--ka-font-heading)' }}>
+              Plan Activated & Brief Exported
+            </h1>
+            <div style={{ fontSize: 14, color: 'var(--ne-text-secondary)', lineHeight: 1.5 }}>
+              {active.length} accounts assigned to {activatedAgency?.name} · {meta.label}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginTop: 14 }}>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '5px 14px', borderRadius: 100,
+                background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)',
+              }}>
+                <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#10B981' }} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#059669', letterSpacing: '0.04em' }}>ACTIVE</span>
+              </div>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '5px 14px', borderRadius: 100,
+                background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)',
+              }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#6366F1', letterSpacing: '0.04em' }}>BRIEF EXPORTED</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Agency card */}
+          <div style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--ne-shadow-rest)', marginBottom: 24 }}>
+            <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--ne-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Partner Agency</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 100, background: 'rgba(99,102,241,0.08)' }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#6366F1' }}>Brief exported</span>
+              </div>
+            </div>
+            <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{
+                width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', fontSize: 18, fontWeight: 800,
+              }}>
+                {activatedAgency?.name?.slice(0, 1)}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ne-text)' }}>{activatedAgency?.name}</div>
+                <div style={{ fontSize: 12, color: 'var(--ne-text-muted)', marginTop: 2 }}>
+                  {activatedAgency?.capacity} contracted slots · ${activatedAgency?.costPerDrop}/drop
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 20, fontWeight: 800, color: '#6366F1', fontFamily: 'var(--ka-font-heading)' }}>
+                  ${totalServiceFee}
+                </div>
+                <div style={{ fontSize: 10, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>est. service fee</div>
+              </div>
+            </div>
+            <div style={{ padding: '10px 20px', borderTop: '1px solid var(--ne-border)', background: 'var(--ne-surface-base)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F59E0B', flexShrink: 0 }} />
+              <span style={{ fontSize: 12, color: 'var(--ne-text-secondary)' }}>
+                Pending Assignment · Contact <strong>{activatedAgency?.contact}</strong> to confirm field team allocation
+              </span>
+            </div>
+          </div>
+
+          {/* KPI bar */}
+          <div style={{
+            background: 'linear-gradient(141deg, #6366F1 0%, #818CF8 100%)',
+            borderRadius: 12, padding: '20px 24px', marginBottom: 24,
+            boxShadow: '0 4px 20px rgba(99,102,241,0.3)',
+            position: 'relative', overflow: 'hidden',
+            display: 'flex', gap: 0, justifyContent: 'space-between',
+          }}>
+            <div style={{ position: 'absolute', top: -15, right: -15, width: 60, height: 60, borderRadius: 30, background: 'rgba(255,255,255,0.08)' }} />
+            {[
+              { label: 'Accounts', value: active.length },
+              { label: 'Volume Potential', value: `+${totalPotential}`, unit: 'UC/wk' },
+              { label: 'Monthly Revenue', value: `$${monthlyRevenue.toFixed(0)}` },
+              { label: 'Est. Service Fee', value: `$${totalServiceFee}`, unit: '/cycle' },
+            ].map((kpi, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'stretch' }}>
+                {i > 0 && <div style={{ width: 1, background: 'rgba(255,255,255,0.12)', margin: '0 24px', alignSelf: 'stretch' }} />}
+                <div>
+                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{kpi.label}</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', lineHeight: 1, fontFamily: 'var(--ka-font-heading)' }}>
+                    {kpi.value}
+                    {kpi.unit && <span style={{ fontSize: 11, fontWeight: 400, color: 'rgba(255,255,255,0.45)', marginLeft: 4 }}>{kpi.unit}</span>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Handover note */}
+          <div style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', boxShadow: 'var(--ne-shadow-rest)', marginBottom: 28, borderLeft: '3px solid #6366F1' }}>
+            <div style={{ fontSize: 13, color: 'var(--ne-text)', lineHeight: 1.6 }}>
+              The handover brief has been downloaded with the full account list, opening argument, and phase instructions. Share it with the partner agency to confirm field team allocation and timeline.
+            </div>
+          </div>
+
+          {/* CTAs */}
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+            <button
+              onClick={downloadBrief}
+              style={{
+                background: 'var(--ne-text)', color: '#fff', fontWeight: 700,
+                padding: '11px 24px', borderRadius: 100, border: 'none', cursor: 'pointer',
+                fontSize: 13, fontFamily: 'var(--ka-font-body)',
+                display: 'flex', alignItems: 'center', gap: 8,
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download Brief
+            </button>
+            <button style={{ background: '#fff', color: 'var(--ne-text)', fontWeight: 600, padding: '11px 24px', borderRadius: 100, border: '1px solid var(--ne-border)', cursor: 'pointer', fontSize: 13, fontFamily: 'var(--ka-font-body)' }}>
+              View Progress
+            </button>
+            <button style={{ background: '#fff', color: 'var(--ne-text-secondary)', fontWeight: 600, padding: '11px 24px', borderRadius: 100, border: '1px solid var(--ne-border)', cursor: 'pointer', fontSize: 13, fontFamily: 'var(--ka-font-body)' }}>
+              Go to Active Plans
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    // ── Own Team post-activation ──────────────────────────────────────────────
     return (
       <div style={{
         maxWidth: 720, margin: '0 auto', padding: '56px 32px 80px',
@@ -343,7 +571,7 @@ export default function Step4Dispatch({
         </div>
       </div>
 
-      <div style={{ padding: '0 32px 48px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ padding: '0 24px 48px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* ── Mission value bar ── */}
         <div style={{
@@ -352,24 +580,28 @@ export default function Step4Dispatch({
           borderRadius: 12,
           boxShadow: '0 4px 24px rgba(99,102,241,0.3)',
           position: 'relative', overflow: 'hidden',
-          display: 'flex', gap: 0, alignItems: 'stretch', flexWrap: 'wrap',
+          display: 'flex', gap: 0, alignItems: 'stretch',
         }}>
           <div style={{ position: 'absolute', top: -15, right: -15, width: 60, height: 60, borderRadius: 30, background: 'rgba(255,255,255,0.08)' }} />
           <div style={{ position: 'absolute', bottom: -20, left: '30%', width: 80, height: 80, borderRadius: 40, background: 'rgba(255,255,255,0.04)' }} />
           {[
-            { label: 'Target Accounts',               value: active.length,                    unit: null },
-            { label: 'Volume Potential',               value: `+${totalPotential}`,             unit: 'UC/wk' },
-            { label: 'Monthly Revenue When Converted', value: `$${monthlyRevenue.toFixed(0)}`,  unit: null },
-            { label: 'Est. Mission Time',              value: fmtHours(missionMins),            unit: '/wk' },
-            { label: 'To Activate an Account',         value: '3',                              unit: 'confirmed orders' },
+            { label: 'Target Accounts',               value: active.length,                        unit: null              },
+            { label: 'Volume Potential',               value: `+${totalPotential}`,                 unit: 'UC/wk'           },
+            { label: 'Monthly Revenue When Converted', value: `$${monthlyRevenue.toFixed(0)}`,      unit: null              },
+            isExternal
+              ? { label: 'Cost / Drop',            value: agency ? `$${costPerDrop}` : '—',       unit: null              }
+              : { label: 'Est. Mission Time',       value: fmtHours(missionMins),                  unit: '/wk'             },
+            isExternal
+              ? { label: 'Est. Service Fee',        value: agency ? `$${totalServiceFee}` : '—',  unit: agency ? '/cycle' : null }
+              : { label: 'To Activate an Account',  value: '3',                                    unit: 'confirmed orders'},
           ].map((kpi, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'stretch' }}>
-              {i > 0 && <div style={{ width: 1, background: 'rgba(255,255,255,0.1)', margin: '0 28px', alignSelf: 'stretch' }} />}
-              <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{kpi.label}</div>
-                <div style={{ fontSize: 28, fontWeight: 800, color: '#FFFFFF', lineHeight: 1, fontFamily: 'var(--ka-font-heading)' }}>
+            <div key={i} style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+              {i > 0 && <div style={{ width: 1, background: 'rgba(255,255,255,0.1)', margin: '0 18px', alignSelf: 'stretch' }} />}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4 }}>
+                <div style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.07em', whiteSpace: 'nowrap' }}>{kpi.label}</div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', lineHeight: 1, fontFamily: 'var(--ka-font-heading)', whiteSpace: 'nowrap' }}>
                   {kpi.value}
-                  {kpi.unit && <span style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.45)', marginLeft: 4 }}>{kpi.unit}</span>}
+                  {kpi.unit && <span style={{ fontSize: 11, fontWeight: 400, color: 'rgba(255,255,255,0.45)', marginLeft: 3 }}>{kpi.unit}</span>}
                 </div>
               </div>
             </div>
@@ -381,24 +613,85 @@ export default function Step4Dispatch({
           <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
             Assigned To
           </div>
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-            {assignedRoutes.map(({ route, supervisor }) => (
-              <div key={route} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 14px 6px 6px', background: 'var(--ne-surface-base)', borderRadius: 100 }}>
-                <div style={{
-                  width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-                  background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#fff', fontSize: 10, fontWeight: 700,
-                }}>
-                  {supervisor.split(' ').map(w => w[0]).slice(0, 2).join('')}
+          {isExternal ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <select
+                value={selectedAgency || ''}
+                onChange={e => setSelectedAgency(e.target.value || null)}
+                style={{
+                  width: '100%', padding: '9px 14px', borderRadius: 8,
+                  border: `1.5px solid ${selectedAgency ? 'var(--ne-text)' : 'var(--ne-border)'}`,
+                  background: '#fff', fontSize: 13, color: selectedAgency ? 'var(--ne-text)' : 'var(--ne-text-muted)',
+                  fontFamily: 'var(--ka-font-body)', cursor: 'pointer', outline: 'none',
+                  appearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: 36,
+                }}
+              >
+                <option value="">Select partner agency…</option>
+                {AGENCIES.map(a => (
+                  <option key={a.id} value={a.id}>{a.name} — ${a.costPerDrop}/drop · {a.capacity - a.used} slots available</option>
+                ))}
+              </select>
+
+              {agency && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 11, color: 'var(--ne-text-muted)' }}>Contracted capacity</span>
+                    <span style={{
+                      fontSize: 11, fontWeight: 700,
+                      color: agency.used / agency.capacity >= 0.9 ? '#DC2626' : 'var(--ne-text)',
+                    }}>
+                      {agency.used} / {agency.capacity} slots used
+                    </span>
+                  </div>
+                  <div style={{ height: 6, borderRadius: 3, background: 'var(--ne-surface-base)', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 3,
+                      width: `${Math.min(100, (agency.used / agency.capacity) * 100)}%`,
+                      background: agency.used / agency.capacity >= 0.9 ? '#DC2626'
+                        : agency.used / agency.capacity >= 0.7 ? '#F59E0B' : '#6366F1',
+                      transition: 'width 0.4s ease',
+                    }} />
+                  </div>
+                  {agency.used / agency.capacity >= 0.9 && (
+                    <div style={{ fontSize: 11, color: '#DC2626', fontWeight: 600 }}>
+                      ⚠ Near capacity — confirm availability before activating
+                    </div>
+                  )}
+                  <div style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    padding: '5px 12px', borderRadius: 100, alignSelf: 'flex-start',
+                    background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)',
+                  }}>
+                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F59E0B' }} />
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#B45309' }}>
+                      Pending Assignment · {agency.contact}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ne-text)', lineHeight: 1.2 }}>{supervisor}</div>
-                  <div style={{ fontSize: 10, color: 'var(--ne-text-muted)' }}>{route} · {active.filter(s => s.route === route).length} accounts</div>
+              )}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              {assignedRoutes.map(({ route, supervisor }) => (
+                <div key={route} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 14px 6px 6px', background: 'var(--ne-surface-base)', borderRadius: 100 }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                    background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#fff', fontSize: 10, fontWeight: 700,
+                  }}>
+                    {supervisor.split(' ').map(w => w[0]).slice(0, 2).join('')}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ne-text)', lineHeight: 1.2 }}>{supervisor}</div>
+                    <div style={{ fontSize: 10, color: 'var(--ne-text-muted)' }}>{route} · {active.filter(s => s.route === route).length} accounts</div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ── Missing Data Gap Alert ── */}
@@ -566,21 +859,25 @@ export default function Step4Dispatch({
         </div>
 
         {/* ── Activate Plan CTA ── */}
+        {isExternal && !selectedAgency && (
+          <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--ne-text-muted)', marginBottom: -8 }}>
+            Select a partner agency above to enable activation
+          </div>
+        )}
         <button
-          onClick={() => setDispatched(true)}
-          disabled={active.length === 0}
+          onClick={() => { if (isExternal) downloadBrief(); setDispatched(true) }}
+          disabled={!canActivate}
           style={{
             width: '100%',
-            background: active.length > 0 ? 'var(--ne-text)' : 'var(--ne-surface-base)',
-            color: active.length > 0 ? '#fff' : 'var(--ne-text-muted)',
+            background: canActivate ? 'var(--ne-text)' : 'var(--ne-surface-base)',
+            color: canActivate ? '#fff' : 'var(--ne-text-muted)',
             fontWeight: 700, padding: '14px', borderRadius: 100,
-            border: 'none', cursor: active.length > 0 ? 'pointer' : 'not-allowed',
-            fontSize: 14,
-            fontFamily: 'var(--ka-font-body)',
+            border: 'none', cursor: canActivate ? 'pointer' : 'not-allowed',
+            fontSize: 14, fontFamily: 'var(--ka-font-body)',
             transition: 'background var(--ne-ease-color)',
           }}
         >
-          Activate Plan
+          {isExternal ? 'Activate & Export Brief' : 'Activate Plan'}
         </button>
 
         {/* ── Opening Argument — secondary ── */}

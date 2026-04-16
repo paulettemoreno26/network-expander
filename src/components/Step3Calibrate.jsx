@@ -329,6 +329,47 @@ export default function Step3Calibrate({
   const [rule3Open, setRule3Open] = useState(false)
   const prevKpiRef = useRef(null)
   const [kpiDeltas, setKpiDeltas] = useState({})
+  const [hoveredKpi, setHoveredKpi] = useState(null)
+  const [budget, setBudget] = useState('')
+  const tooltipTimerRef = useRef(null)
+
+  function handleKpiEnter(idx) {
+    clearTimeout(tooltipTimerRef.current)
+    tooltipTimerRef.current = setTimeout(() => setHoveredKpi(idx), 320)
+  }
+  function handleKpiLeave() {
+    clearTimeout(tooltipTimerRef.current)
+    setHoveredKpi(null)
+  }
+
+  function getKpiTooltip(key) {
+    const cityLabel = CITY_LABELS[city] || city || 'this market'
+    const channelLabel = (CHANNEL_LABELS[channel] || channel || 'traditional').toLowerCase()
+    const deviationLabel = DEVIATION_OPTIONS.find(o => o.value === routeDeviation)?.label || `${routeDeviation}m`
+    const goldCount = inReach.filter(s => s.tier === 'gold').length
+    const silverCount = inReach.filter(s => s.tier === 'silver').length
+    const topTierPct = inReach.length > 0 ? Math.round(((goldCount + silverCount) / inReach.length) * 100) : 0
+    const delta = kpiDeltas[key]
+    switch (key) {
+      case 'vol':
+        if (delta && delta < 0) return `Volume decrease — fewer accounts pass the ${isDensity ? `${deviationLabel} deviation` : 'active tier and category'} filters in the ${cityLabel} ${channelLabel} segment.`
+        if (delta && delta > 0) return `Volume increase — ${isDensity ? `${deviationLabel} deviation captures more accounts near active routes` : 'additional high-potential clusters entered scope'} in ${cityLabel}.`
+        return `Total UC/wk potential across ${inReach.length} ${channelLabel} accounts in ${cityLabel} under the active filter set.`
+      case 'prob':
+        if (delta && delta > 0) return `Probability up — ${topTierPct}% Gold/Silver mix and ${persistence}-week cycle align with historical ${channelLabel} conversion rates in ${cityLabel}.`
+        if (delta && delta < 0) return `Probability down — lower-tier accounts or a shorter cycle reduce expected conversion for the ${channelLabel} channel in ${cityLabel}.`
+        return `Driven by ${topTierPct}% premium-tier mix and ${persistence}-week persistence. Historical ${channelLabel} rate for this segment in ${cityLabel}.`
+      case 'cac':
+        if (delta && delta > 0) return `CAC increased — ${isDensity ? `${deviationLabel} deviation adds travel overhead per account` : `${persistence}-week cycle raises total visit cost per store`}.`
+        if (delta && delta < 0) return `CAC down — tighter filter constraints reduce visits and travel overhead per account.`
+        return `$${cacPerStore}/account based on ${isDensity ? `${deviationLabel} route deviation` : `${persistence}-week outreach cycle`}. ${inReach.length} accounts in scope.`
+      case 'invest':
+        if (delta && delta > 0) return `Investment up — ${inReach.length} accounts in scope at $${cacPerStore} CAC. Adjust tier or ${isDensity ? 'distance' : 'category'} filters to reduce total spend.`
+        if (delta && delta < 0) return `Investment down — fewer accounts after filter change. Currently ${inReach.length} × $${cacPerStore}.`
+        return `${inReach.length} accounts × $${cacPerStore} CAC at current ${cityLabel} ${channelLabel} constraints.`
+      default: return ''
+    }
+  }
 
   const isDensity = strategy === 'density'
   const stratConfig = STRATEGY_CONFIG[strategy] || {}
@@ -389,6 +430,15 @@ export default function Step3Calibrate({
   const pathEff = PATH_EFFICIENCY[routeDeviation] ?? 0.82
   const avgUC = inReach.length > 0 ? totalPotential / inReach.length : 0
   const paybackMo = totalCAC > 0 && monthlyRevenue > 0 ? (totalCAC / monthlyRevenue).toFixed(1) : null
+
+  // Decision Guardrail — high-priority alerts only
+  const budgetLimit = parseFloat(budget) || 0
+  const alertBudget = budgetLimit > 0 && totalCAC > budgetLimit
+    ? { msg: `Campaign cost $${totalCAC} exceeds your $${budgetLimit} limit by $${totalCAC - budgetLimit}.` }
+    : null
+  const alertSuccessCritical = inReach.length > 0 && successProb < 55
+    ? { msg: `${successProb}% conversion likelihood is below the 55% viability threshold. Tighten tier filter or extend persistence.` }
+    : null
   const coveragePct = inReach.length > 0 ? Math.round((inReach.length / filteredPool.length) * 100) : 0
   const expectedWeeklyVol = Math.round(expectedStores * avgUC)
   const roiPct = totalCAC > 0 && monthlyRevenue > 0 ? ((monthlyRevenue / totalCAC - 1) * 100).toFixed(1) : null
@@ -740,6 +790,31 @@ export default function Step3Calibrate({
                 </div>
               </div>
 
+              {/* Campaign Budget */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--ne-text)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  Campaign Budget
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ne-text-muted)' }}>$</span>
+                  <input
+                    type="number"
+                    value={budget}
+                    onChange={e => setBudget(e.target.value)}
+                    placeholder="Set limit…"
+                    style={{
+                      flex: 1, padding: '6px 10px', borderRadius: 8,
+                      border: `1.5px solid ${alertBudget ? '#DC2626' : 'var(--ne-border)'}`,
+                      fontSize: 12, fontFamily: 'var(--ka-font-body)',
+                      background: 'var(--ne-surface-base)', color: 'var(--ne-text)', outline: 'none',
+                    }}
+                  />
+                </div>
+                <div style={{ fontSize: 10, color: alertBudget ? '#DC2626' : 'var(--ne-text-muted)', fontWeight: alertBudget ? 600 : 400 }}>
+                  Current investment: <strong>${totalCAC}</strong>
+                </div>
+              </div>
+
               {/* Rule of 3 Tracker — density only, collapsible */}
               {isDensity && (
                 <>
@@ -818,55 +893,75 @@ export default function Step3Calibrate({
         {/* ── CENTER — KPIs + Map ── */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 11, alignItems: 'center', justifyContent: 'center', minWidth: 0 }}>
 
-          {/* KPI strip */}
+          {/* KPI strip — 4 uniform cards */}
           <div style={{ display: 'flex', alignItems: 'stretch', gap: 10, width: '100%', height: 80, flexShrink: 0 }}>
-            {/* Hero — Potential Volume */}
-            <div style={{
-              flex: 1, minWidth: 200,
-              background: 'linear-gradient(141deg, #6366F1 0%, #818CF8 100%)',
-              borderRadius: 12, padding: '16px 20px',
-              position: 'relative', overflow: 'hidden',
-              boxShadow: '0 4px 16px rgba(99,102,241,0.25)',
-              display: 'flex', flexDirection: 'column', gap: 6,
-            }}>
-              <div style={{
-                position: 'absolute', top: -10, right: -10, width: 48, height: 48,
-                borderRadius: 24, background: 'rgba(255,255,255,0.08)',
-              }} />
-              <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                Potential Volume
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                <span style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1, letterSpacing: '-0.025em' }}>
-                  {inReach.length > 0 ? `+${totalPotential}` : '\u2014'}
-                </span>
-                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', fontWeight: 500, letterSpacing: '-0.03em' }}>UC/wk</span>
-                <KpiDelta delta={kpiDeltas.vol} onDark />
-              </div>
-            </div>
-
-            {/* Secondary KPIs */}
             {[
-              { label: 'Success Probability', value: inReach.length > 0 ? `${successProb}%` : '\u2014', dk: 'prob' },
-              { label: 'Est. CAC / Store', value: `$${cacPerStore}`, dk: 'cac', inv: true },
-              { label: 'Total Investment', value: `$${totalCAC}`, dk: 'invest', inv: true },
-            ].map((k, i) => (
-              <div key={i} style={{
-                width: 200, flexShrink: 0,
-                background: '#fff', borderRadius: 12,
-                padding: '14px 18px',
-                boxShadow: 'var(--ne-shadow-rest)',
-                display: 'flex', flexDirection: 'column', gap: 6,
-              }}>
-                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>
-                  {k.label}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
-                  <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--ne-text)', lineHeight: 1, letterSpacing: '-0.02em' }}>
-                    {k.value}
-                  </span>
-                  <KpiDelta delta={kpiDeltas[k.dk]} inverted={k.inv} />
-                </div>
+              {
+                idx: 0, dk: 'vol', isHero: true,
+                label: 'Potential Volume',
+                value: inReach.length > 0 ? `+${totalPotential}` : '\u2014',
+                unit: 'UC/wk',
+              },
+              { idx: 1, dk: 'prob', label: 'Success Probability', value: inReach.length > 0 ? `${successProb}%` : '\u2014', inv: false },
+              { idx: 2, dk: 'cac',  label: 'Est. CAC / Store',    value: `$${cacPerStore}`,  inv: true  },
+              { idx: 3, dk: 'invest', label: 'Total Investment',   value: `$${totalCAC}`,    inv: true  },
+            ].map(k => (
+              <div
+                key={k.idx}
+                style={{ flex: 1, position: 'relative', cursor: 'default' }}
+                onMouseEnter={() => handleKpiEnter(k.idx)}
+                onMouseLeave={handleKpiLeave}
+              >
+                {k.isHero ? (
+                  <div style={{
+                    background: 'linear-gradient(141deg, #6366F1 0%, #818CF8 100%)',
+                    borderRadius: 12, padding: '14px 18px',
+                    position: 'relative', overflow: 'hidden',
+                    boxShadow: '0 4px 16px rgba(99,102,241,0.25)',
+                    display: 'flex', flexDirection: 'column', gap: 5,
+                    height: '100%', boxSizing: 'border-box',
+                  }}>
+                    <div style={{ position: 'absolute', top: -10, right: -10, width: 44, height: 44, borderRadius: 22, background: 'rgba(255,255,255,0.08)' }} />
+                    <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      {k.label}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                      <span style={{ fontSize: 22, fontWeight: 800, color: '#fff', lineHeight: 1, letterSpacing: '-0.025em' }}>{k.value}</span>
+                      {k.unit && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>{k.unit}</span>}
+                      <KpiDelta delta={kpiDeltas[k.dk]} onDark />
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{
+                    background: '#fff', borderRadius: 12, padding: '14px 18px',
+                    boxShadow: 'var(--ne-shadow-rest)',
+                    display: 'flex', flexDirection: 'column', gap: 5,
+                    height: '100%', boxSizing: 'border-box',
+                  }}>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>
+                      {k.label}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
+                      <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--ne-text)', lineHeight: 1, letterSpacing: '-0.02em' }}>{k.value}</span>
+                      <KpiDelta delta={kpiDeltas[k.dk]} inverted={k.inv} />
+                    </div>
+                  </div>
+                )}
+                {hoveredKpi === k.idx && (
+                  <div style={{
+                    position: 'absolute', top: 'calc(100% + 8px)', left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: 'rgba(12,12,16,0.95)', color: 'rgba(255,255,255,0.9)',
+                    fontSize: 11, fontWeight: 400, lineHeight: 1.5,
+                    padding: '8px 12px', borderRadius: 7,
+                    maxWidth: 260, width: 'max-content',
+                    pointerEvents: 'none', zIndex: 200,
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+                  }}>
+                    <div style={{ position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderBottom: '5px solid rgba(12,12,16,0.95)' }} />
+                    {getKpiTooltip(k.dk)}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -921,6 +1016,54 @@ export default function Step3Calibrate({
 
           <div style={{ flex: 1, overflowY: 'auto', padding: '16px 24px 24px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+              {/* ── Decision Guardrail ── */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--ne-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  Execution Feasibility
+                </div>
+
+                {alertBudget && (
+                  <div style={{ background: '#FEF2F2', borderRadius: 10, padding: '12px 14px', borderLeft: '3px solid #DC2626' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                      </svg>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: '#DC2626', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Budget Exceeded</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: '#7F1D1D', lineHeight: 1.5 }}>{alertBudget.msg}</div>
+                  </div>
+                )}
+
+                {alertSuccessCritical && (
+                  <div style={{ background: '#FEF2F2', borderRadius: 10, padding: '12px 14px', borderLeft: '3px solid #DC2626' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                      </svg>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: '#DC2626', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Low Viability</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: '#7F1D1D', lineHeight: 1.5 }}>{alertSuccessCritical.msg}</div>
+                  </div>
+                )}
+
+                {!alertBudget && !alertSuccessCritical && (
+                  <div style={{ background: 'rgba(16,185,129,0.06)', borderRadius: 10, padding: '12px 14px', border: '1px solid rgba(16,185,129,0.18)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <circle cx="7" cy="7" r="6.5" stroke="#10B981" strokeWidth="1.2" />
+                        <polyline points="4,7 6,9.5 10,4.5" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#059669', marginBottom: 1 }}>Plan is feasible</div>
+                        <div style={{ fontSize: 10, color: '#065F46', lineHeight: 1.4 }}>No critical blockers detected.</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div style={{ height: 1, background: 'var(--ne-border)' }} />
 
               {/* Weekly Volume */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
