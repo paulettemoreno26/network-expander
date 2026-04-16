@@ -571,7 +571,7 @@ export default function Step4Dispatch({
         </div>
       </div>
 
-      <div style={{ padding: '16px 24px 48px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ maxWidth: 960, margin: '0 auto', padding: '16px 24px 48px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* ── Mission value bar ── */}
         <div style={{
